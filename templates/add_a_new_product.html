@@ -1,0 +1,369 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<script>
+    window.onload = function () {
+        var myCatDict = {{ c_dict | safe}};
+        console.log({{ c_dict | safe}})
+        var catSel = document.getElementById("parentCategory");
+        var childSel = document.getElementById("childCategory");
+        var grantchildSel = document.getElementById("grantChildCategory");
+        for (var x in myCatDict) {
+            catSel.options[catSel.options.length] = new Option(x, x);
+            console.log(x)
+        }
+        console.log(catSel[catSel.selectedIndex].value);
+        catSel.onchange = function () {
+            var sel = catSel[catSel.selectedIndex].value
+            childSel.length = 1;
+            console.log('myCatDict : ', sel)
+            for (y in myCatDict[sel]) {
+                childSel.options[childSel.options.length] = new Option(y, y);
+            }
+            childSel.onchange = function () {
+                var gsel = childSel[childSel.selectedIndex].value
+                console.log(' gsel : ', gsel)
+                var y = myCatDict[sel][gsel]
+                grantchildSel.length = 1;
+                console.log('myCatDict[sel][gsel]', y)
+                for (i in myCatDict[sel][gsel]) {
+                    var optn = myCatDict[sel][gsel][i]
+                    console.log('optn', optn)
+                    grantchildSel.options[grantchildSel.options.length] = new Option(optn, optn);
+                }
+            }
+        }       
+    }
+</script>
+<section>
+    <div class="container">
+        <div class="card m-5">
+            <div class="card-header text-center display-6">Add Product</div>
+            <form id="form" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="card-title text-center">
+                    <label for="Category">
+                        <p class="fs-3 py-2">Add Grant Child Category</p>
+                    </label>
+                </div>
+                <div class="card-body">
+                    <!--  <div class="my-1">
+                        <select name="category" id="parentCategory" class="form-select"
+                            aria-label="Default select example">
+                            <option selected disabled>Select Category</option>
+                        </select>
+                    </div>
+                    <div class="my-1">
+                        <select name="childcategory" id="childCategory" class="form-select"
+                            aria-label="Default select example">
+                            <option selected disabled>Select Child Category</option>
+                        </select>
+                    </div>
+                    <div class="my-1">
+                        <select name="grantchildcategory" id="grantChildCategory" class="form-select"
+                            aria-label="Default select example">
+                            <option selected disabled>Select Grant Child Category</option>
+                        </select>
+                    </div>
+                </div> -->
+                    <div class="p-5">
+                        <div class="row py-1">
+                            <div class="col-md-2">
+                                <label class="float-md-end" for="exampleInputEmail1"
+                                    style="white-space: nowrap;">Category
+                                </label>
+                            </div>
+
+                            <div class="col-md-10">
+                                <!-- <select name="category" class="custom-select form-control data" id="myselect">
+
+                                <option selected disabled>Select Category</option>
+                                {% for category in cat_list %}
+                                <option value="{{category}}">{{category}}</option>
+                                {% endfor %}
+                            </select> -->
+
+                                <select name="category" id="parentCategory" class="custom-select form-control data"
+                                    aria-label="Default select example">
+                                    <option selected>Select Category</option>
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="row py-1">
+                            <div class="col-md-2">
+                                <label class="float-md-end" for="exampleInputEmail1" style="white-space: nowrap;">Child
+                                    Category
+                                </label>
+                            </div>
+
+                            <div class="col-md-10">
+                                <!-- <select name="childcategory" class="custom-select form-control data" id="myselect">
+
+                                <option selected disabled>Select Child Category</option>
+                                {% for category in child_cat %}
+                                <option value="{{category}}">{{category}}</option>
+                                {% endfor %}
+                            </select> -->
+
+                                <select name="childcategory" id="childCategory" class="custom-select form-control data"
+                                    aria-label="Default select example">
+                                    <option selected disabled>Select Child Category</option>
+                                </select>
+
+                            </div>
+                        </div>
+
+                        <div class="row py-1">
+                            <div class="col-md-2">
+                                <label class="float-md-end" for="exampleInputEmail1" style="white-space: nowrap;">Grant
+                                    Child Category
+                                </label>
+                            </div>
+
+                            <div class="col-md-10">
+                                <!-- <select name="grantchildcategory" class="custom-select form-control data" id="myselect">
+
+                                <option selected disabled>Select Category</option>
+                                {% for category in grant_child_cat %}
+                                <option value="{{category}}">{{category}}</option>
+                                {% endfor %}
+                            </select> -->
+
+                                <select name="grantchildcategory" id="grantChildCategory"
+                                    class="custom-select form-control data" aria-label="Default select example">
+                                    <option selected>Select Grant Child Category</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ||||||||||||||||||||||||||||||||||||||||||||||||||||||| -->
+
+                    <!-- <div class="card-body">
+                        <div class="my-1">
+                            <select name="category" id="parentCategory" class="form-select"
+                                aria-label="Default select example">
+                                <option selected>Select Category</option>
+
+                            </select>
+                        </div>
+                        <div class="my-1">
+                            <select name="child_category" id="childCategory" class="form-select"
+                                aria-label="Default select example">
+                                <option selected>Select Child Category</option>
+                            </select>
+                        </div>
+                        <div class="my-1">
+                            <input name="grant_child_category" class="form-control" type="text" name="child_category"
+                                id="" placeholder="Child Category">
+                        </div>
+                    </div> -->
+                    <!-- |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| -->
+                    <div id="id" class="col-md-12 px-md-5 px-sm-2 px-lg-5px-xl-5" >
+
+
+                        <!-- ================================================ -->
+                        <div class="row py-1">
+                            <div class="col col-md-2">
+                                <label class="float-md-end" class="p-2" for="product_name"
+                                    style="white-space: nowrap;">Name</label>
+                            </div>
+                            <div class="col-md-10">
+                                <input type="text" class="form-control data" name="product_name" id="myalldata"
+                                    aria-describedby="product_name">
+                            </div>
+                        </div>
+                        <div class="row py-1">
+                            <div class="col-md-2">
+                                <label class="float-md-end" for="product_title">Title</label>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control data" id="myalldata" name="product_title"
+                                    aria-describedby="product_title">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="float-md-end" for="product_price">Price</label>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="number" class="form-control data" id="myalldata" name="product_price"
+                                    aria-describedby="product_price">
+                            </div>
+                        </div>
+                        <div class="row py-1">
+                            <div class="col col-md-2">
+                                <label class="float-md-end" class="p-2" for="product_quantity"
+                                    style="white-space: nowrap;">Quantity</label>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="number" class="form-control data" name="product_quantity" id="myalldata"
+                                    aria-describedby="product_quantity">
+                            </div>
+
+                            <div class="col col-md-2">
+                                <label class="float-md-end" class="p-2" for="product_brand"
+                                    style="white-space: nowrap;">Brand</label>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control data" name="product_brand" id="myalldata"
+                                    aria-describedby="product_brand">
+                            </div>
+
+
+
+
+                        </div>
+                        <div class="row py-1">
+                            <div class="col-md-2">
+                                <label class="float-md-end" for="a_images">Images</label>
+                            </div>
+                            <div class="col-md-9">
+                                <input multiple type="file" name="images" class="form-control" id="imag">
+                            </div>
+                        </div>
+                        <div class="row py-1">
+                            <div class="col-md-2">
+                                <label class="float-end" for="exampleInputEmail1"
+                                    style="white-space: nowrap;">Description</label>
+                            </div>
+
+                            <div class="col-md-10">
+                                <textarea class="form-control data" name="description" id="myalldata"
+                                    name="product_detail_id" cols="30" rows="3"></textarea>
+                            </div>
+
+                        </div>
+
+                        <div class="row pt-5 pb-3 ">
+                            <div class="d-inline">
+                                <div class="text-center ">
+
+                                    <h4>Add Features</h4>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-sm-3">
+
+                            </div>
+                        </div>
+                        <!-- <div class="row pb-2 text-center">
+                            <div class="col-md-4 text-muted">
+                                Feature Name
+                            </div>
+                            <div class="col-md-6 text-muted">
+                                Feature Value
+                            </div>
+                        </div> -->
+                        <div class="row py-1">
+
+                            <div class="py-2 col-md-4">
+                                <input type="text" class="form-control data" id="myalldata" name="feature_name1"
+                                    placeholder="Feature Name" aria-describedby="feature_name">
+                            </div>
+                            <div class="py-2 col-md-6">
+                                <input type="text" class="form-control data" id="myalldata" name="feature_value1"
+                                    placeholder="Feature" aria-describedby="feature_value">
+                            </div>
+
+                        </div>
+                        <div id="newinput"></div>
+                        <!-- <div class="row py-1">
+                            <div class="col-md-2">
+                                <label class="float-md-end" for="exampleInputEmail1">Camera</label>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="exampleInputEmail1"
+                                    aria-describedby="emailHelp">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="float-md-end" for="exampleInputEmail1">Memory</label>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="exampleInputEmail1"
+                                    aria-describedby="emailHelp">
+                            </div>
+                        </div>
+
+                        <div class="row py-1">
+                            <div class="col-md-2">
+                                <label class="float-md-end" for="exampleInputEmail1">Battery</label>
+                            </div>
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" id="exampleInputEmail1"
+                                    aria-describedby="emailHelp">
+                            </div>
+                        </div> -->
+
+                        <!-- ======================================= -->
+
+
+                        <button style="white-space:nowrap;" id="rowAdder" type="button"
+                            class="float-start btn btn-dark">
+                            <i class="fa-solid fa-plus"></i> ADD
+                        </button>
+
+                        <div class="row float-end pt-5 pb-2">
+                            <button type="submit" class="btn btn-primary ">Add Product</button>
+                        </div>
+                    </div>
+            </form>
+
+        </div>
+    </div>
+    <script type="text/javascript">
+
+
+
+
+        var idx = 2
+        $("#rowAdder").click(function () {
+            newRowAdd =
+                `<div id="feature_div" class="row py-1 g-2">
+
+                    <div class="col-md-4">
+                        <input type="text" class="form-control data" placeholder="Feature name `+ idx + `" id="myalldata" name="feature_name` + idx + `"
+                            aria-describedby="feature_name">
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" class="form-control data" placeholder="Feature `+ idx + `" id="myalldata" name="feature_value` + idx + `"
+                            aria-describedby="feature_value">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-danger p-2 " id="DeleteRow" type="button">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>`
+            $('#newinput').append(newRowAdd);
+            idx = idx + 1
+        });
+
+
+        $("body").on("click", "#DeleteRow", function () {
+            $(this).parents("#feature_div").remove();
+        })
+
+        $('#form').on('submit', function (e) {
+            e.preventDefault()
+            var formData = new FormData(this);
+            console.log(formData)
+            $.ajax({
+                url: "{% url 'add_product' %}",
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    console.log(response)
+                    location.reload();
+                },
+                error: function (response) {
+                    console.log(response)
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            })
+        });
+
+    </script>
+</section>
+
+{% endblock %}

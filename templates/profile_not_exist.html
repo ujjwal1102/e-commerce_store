@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<section>
+    <div class="container">
+        <div class="row d-flex justify-content-center">
+            <div class="col-md-4 col-12 col-sm-9">
+                <div class="card py-4 my-5">
+                    <div class="card-title text-center lead display-5">
+                        Oopsss...!!!
+                    </div>
+                    <div class="card-text lead py-4 text-center">
+                        Profile not exist..!!
+                    </div>
+                    <div class="py-3 text-center">
+                        <a href="{% url 'create_profile' %}">
+                            <button class="btn btn-primary rounded-3">
+                                Create Profile
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

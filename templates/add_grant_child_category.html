@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% include 'category_header.html' %}
+<section>
+    <script>
+        var myCatDict = {{cat_dict|safe}};
+        
+        window.onload = function () {
+            var subjectSel = document.getElementById("parentCategory");
+            var topicSel = document.getElementById("childCategory");
+            for (var x in myCatDict) {
+                subjectSel.options[subjectSel.options.length] = new Option(x, x);
+            }
+            subjectSel.onchange = function () {
+                console.log(subjectSel[subjectSel.selectedIndex].value);
+                topicSel.length = 1;
+                for (var y of myCatDict[this[this.selectedIndex].value]) {
+                    topicSel.options[topicSel.options.length] = new Option(y, y);
+                }
+            }
+        }
+    </script>
+</section>
+
+
+<section class="category py-5">
+    <div class="d-flex justify-content-center">
+        <div class="card">
+            <form method="post">
+                <div class="row m-3">
+                    {% csrf_token %}
+                    <div class="card-title text-center">
+                        <label for="Category">
+                            <p class="fs-3 py-2">Add Grant Child Category</p>
+                        </label>
+                    </div>
+                    <div class="card-body">
+                        <div class="my-1">
+                            <select name="category" id="parentCategory" class="form-select" aria-label="Default select example">
+                                <option selected>Select Category</option>
+                                
+                            </select>
+                        </div>
+                        <div class="my-1">
+                            <select name="child_category" id="childCategory" class="form-select" aria-label="Default select example">
+                                <option selected>Select Child Category</option>
+                            </select>
+                        </div>
+                        <div class="my-1">
+                            <input name="grant_child_category" class="form-control" type="text" name="child_category" id=""
+                                placeholder="Child Category">
+                        </div>
+                    </div>
+
+                    <div class="my-3 mt-4 d-flex justify-content-center">
+                        <input type="submit" value="Add" class="btn btn-success ">
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

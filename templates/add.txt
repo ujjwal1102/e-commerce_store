@@ -1,0 +1,39 @@
+$('#form').on('submit', function (e) {
+            e.preventDefault();
+            let features = [];
+            var f = $('input[id="myalldata"],input[type="file"],textarea,select');
+            $.each(f, function (i, field) {
+                if (field.value != '') {
+                    console.log(field.name + ":" + field.value)
+                    features.push(field.name + ":" + field.value)
+                }
+                else {
+                    alert('enter feature name')
+                }
+            });
+
+            var myimages = document.getElementById('imag').files;
+            var data = new FormData();
+                       
+            data.append("csrfmiddlewaretoken", $(this).attr("data-csrf-token"));
+
+            console.log(myimages)
+            console.log(data)
+            $.ajax({
+                type: "POST",
+                url: "{% url 'add_a_new_product' %}",
+                data: {
+                    images: JSON.stringify({'myimages' : myimages}),
+                    mydata: JSON.stringify({ 'features': features, 'images': data }),
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    mimeType: "multipart/form-data",
+                    //dataType: 'json',
+
+                },
+                success: function (data) {
+                    $('#output').html('Product added Successfully') /* response message */
+                },
+                failure: function () {
+                }
+            });
+        });

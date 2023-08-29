@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<section id="accounts">
+
+    <div class="container">
+        <div class="row g-5 pb-5 pt-4">
+
+            <!-- <div class="card-title">Accounts</div> -->
+            <div class="card-title text-center lead display-5 pb-1">Accounts</div>
+
+            <div class="d-flex justify-content-center ">
+
+                <div class="col-6 col-sm-6 col-md-5 col-lg-4 col-xl-4 text-center p-2">
+                    <a href="{% url 'signup' 'customer' %}" style="text-decoration: none;">
+                        <div class="card p-2 rounded-4">
+                            <div class="text-center">
+                                <img class="card-img-top " src="{% static 'customer.jpg' %}"
+                                    style="width: 200px; height:200px;">
+                                <div class="card-title text-center lead display-6"><p>Customer</p></div>
+                            </div>
+
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-6 col-sm-6 col-md-5 col-lg-4 col-xl-4 text-center p-2 ">
+                    <a href="{% url 'signup' 'seller' %}" style="text-decoration: none;" >
+                        <div class="card p-2 rounded-4">
+                            <div class="text-center">
+                                <img class="card-img-top" src="{% static 'seller1.jpg' %}"
+                                    style="width: 200px; height:200px;">
+                                <div class="card-title ">
+                                    <p class="text-center lead display-6">Seller</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+</section>
+
+{% endblock %}

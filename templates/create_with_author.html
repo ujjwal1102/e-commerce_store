@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- create_with_author.html :: part 3 -->
+
+<form class="form-horizontal" method="POST" action="">
+    {% csrf_token %}
+<div class="row spacer">
+<div class="col-2">
+    <label>{{bookform.name.label}}</label>
+</div>
+<div class="col-4">
+    <div class="input-group">
+        {{bookform.name}}
+    </div>
+</div>
+</div>
+{{ formset.management_form }}
+{% for form in formset %}
+<div class="row form-row spacer">
+    <div class="col-2">
+        <label>{{form.name.label}}</label>
+    </div>
+    <div class="col-4">
+        <div class="input-group">
+            {{form.name}}
+            <div class="input-group-append">
+                <button class="btn btn-success add-form-row">+</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<div class="row spacer">
+    <div class="col-4 offset-2">
+        <button type="submit" class="btn btn-block btn-primary">Create</button>
+    </div>
+</div>
+</form>
+{% endblock %}

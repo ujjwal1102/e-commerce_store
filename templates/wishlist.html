@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<script>
+    window.onload = function () {
+        const productCards = document.querySelectorAll('.product-card');
+        productCards.forEach((card) => {
+            const plusBtn = card.querySelector('.plus');
+            const minusBtn = card.querySelector('.minus');
+            const countInput = card.querySelector('.count');
+
+            plusBtn.addEventListener('click', () => {
+                countInput.value = parseInt(countInput.value) + 1;
+            });
+
+            minusBtn.addEventListener('click', () => {
+                if (parseInt(countInput.value) > 0) {
+                    countInput.value = parseInt(countInput.value) - 1;
+                }
+            });
+        });
+    }
+</script>
+<section>
+    <div class="container">
+        <div class="card my-5 py-3 px-2">
+            <div class="card-title text-center display-5">Your Wishlist</div>
+            <hr>
+            <div class="card-body">
+                <section id="Mygridview" class="row">
+                    {% if products %}
+                    {% for prod in products %}
+
+                    <div class="col-lg-4 col-md-6 col-sm-6 d-flex">
+                        <div class="card w-100 my-2 shadow-2-strong product-card">
+                            <a class="text-black" href="{% url 'product_detail' prod.product_id %}"
+                                style="text-decoration: none;">
+                            <img src="{{  prod.product_images.url }}" class="card-img-top"
+                                style="background-size:contain; aspect-ratio: 1;" />
+                            
+                                <div class="card-body  d-flex flex-column">
+                                    <h5 class="card-title">${{prod.cost}}</h5>
+                                    <p class="card-text font-weight-light">{{prod.title|truncatechars:50}}</p>
+                                </div>
+                            </a>
+                            <form action="{% url 'remove_from_wishlist' %}" method="post">
+                                {% csrf_token %}
+                                <div class="d-flex justify-content-end">
+                                    <!-- <a href="#!" class="btn btn-light btn-sm icon-hover p-1 ">
+                                            <small><i class="fas fa-heart fa-lg text-secondary px-1"></i></small></a> -->
+                                    <button type="submit" class="btn text-danger text-secondary icon-hover px-2 py-1 mx-2 "><i
+                                            class="bi bi-heart-fill"></i></button>
+                                    <input name="product_id" type="hidden" value="{{prod.product_id}}" >
+                                </div>
+                            </form>
+                            <form action="{% url 'add_to_cart' %}" method="post">
+                                {% csrf_token %}
+                                <div class="d-flex justify-content-between  p-2 ">
+                                    <div>
+                                        <div class="input-group input-group-sm mb-3">
+                                            <button id="minusBtn" {% if prod.product_id in request.session.cart %} disabled {% endif %}
+                                                class="btn btn-outline-dark  btn-sm  py-1 px-2 minus" type="button"
+                                                data-mdb-ripple-color="dark">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <input readonly {% if prod.product_id in request.session.cart %} disabled {% endif %} type="text" name="quantity" id="count"
+                                                class="form-control form-control-sm text-center border border-secondary count"
+                                                value="1" style="max-width: 50px; min-width:30px;" />
+                                            <input type="text" name="id" hidden value="{{prod.product_id}}">
+
+                                            <button id="plusBtn" {% if prod.product_id in request.session.cart %} disabled {% endif %} class="btn btn-outline-dark btn-sm  py-1 px-2 plus"
+                                                type="button" data-mdb-ripple-color="dark">
+                                                <small><i class="fas fa-plus"></i></small>
+                                            </button>
+
+                                        </div>
+                                    </div>
+                                    <div class="">
+                                        <button type="submit" {% if prod.product_id in request.session.cart %} disabled  {% endif %} class="btn btn-primary shadow-0 me-1 btn-sm "
+                                            title="Add to cart" style="white-space: nowrap;">Add to Cart
+                                        </button>
+
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="text-center card-text">
+                        Yoy Didn't Added Any items yet...
+                    </div>
+                    {% endif %}
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

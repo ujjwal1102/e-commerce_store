@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<style>
+
+</style>
+<script type="text/javascript">
+    var BeautYPersonalCare = ''
+    var ClothingShoesJewelry = '';
+    var Electronics = '';
+    var CellPhoneAccessories = '';
+    var Appliances = '';
+    var Books = '';
+
+    var loadFile = function (event) {
+        var image = document.getElementById('output');
+        image.src = URL.createObjectURL(event.target.files[0]);
+    };
+    function appendData1(x) {
+        var ids = document.getElementById("id")
+        var removeele = document.querySelector(".removeele")
+        if (removeele) {
+            removeele.parentNode.removeChild(removeele)
+        }
+        if (x == "1") {
+
+            let htm = `<div class="removeele"><div class="row py-1">
+                <div class="col col-md-2">
+                    <label class="float-md-end" class="p-2" for="exampleInputEmail1"
+                        style="white-space: nowrap;">Title </label>
+                </div>
+                <div class="col-md-10">
+                    <input type="text" name="title" class="form-control" id="exampleInputEmail1"
+                        aria-describedby="emailHelp">
+                </div>
+            </div>
+            <div class="row py-1">
+                <div class="col-md-2">
+                    <label class="float-md-end" for="exampleInputEmail1">Name</label>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="name" class="form-control" id="exampleInputEmail1"
+                        aria-describedby="emailHelp">
+                </div>
+                <div class="col-md-2">
+                    <label class="float-md-end" for="exampleInputEmail1">Price</label>
+                </div>
+                <div class="col-md-4">
+                    <input type="number" name="price" class="form-control" id="exampleInputEmail1"
+                        aria-describedby="emailHelp">
+                </div>
+            </div>
+
+            <div class="row py-1">
+                <div class="col-md-2">
+                    <label class="float-md-end" for="exampleInputEmail1">RAM</label>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="ram" class="form-control" id="exampleInputEmail1"
+                        aria-describedby="emailHelp">
+                </div>
+                <div class="col-md-2">
+                    <label class="float-md-end" for="exampleInputEmail1">Display</label>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="display" class="form-control" id="exampleInputEmail1"
+                        aria-describedby="emailHelp">
+                </div>
+            </div>
+
+            <div class="row py-1">
+                <div class="col-md-2">
+                    <label class="float-md-end" for="exampleInputEmail1">Camera</label>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="camera" class="form-control" id="exampleInputEmail1"
+                        aria-describedby="emailHelp">
+                </div>
+                <div class="col-md-2">
+                    <label class="float-md-end" for="exampleInputEmail1">Memory</label>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="memory" class="form-control" id="exampleInputEmail1"
+                        aria-describedby="emailHelp">
+                </div>
+            </div>
+
+            <div class="row py-1">
+                <div class="col-md-2">
+                    <label class="float-md-end" for="exampleInputEmail1">Colour</label>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="color" class="form-control" id="exampleInputEmail1"
+                        aria-describedby="emailHelp">
+                </div>
+                <div class="col-md-2">
+                    <label class="float-md-end" for="exampleInputEmail1">brand</label>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="brand" class="form-control" id="exampleInputEmail1"
+                        aria-describedby="emailHelp">
+                </div>
+            </div>
+
+            <div class="row py-1">
+                <div class="col-md-2">
+                    <label class="float-md-end" for="exampleInputEmail1">Battery</label>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="battery" class="form-control" id="exampleInputEmail1"
+                        aria-describedby="emailHelp">
+                </div>
+                <div class="col-md-2">
+                    <label class="float-md-end" for="quantity">Quantity</label>
+                </div>
+                <div class="col-md-4">
+                    <input name="quantity" type="number" class="form-control" id="quantity"
+                        aria-describedby="m_quantity"> 
+                </div>
+            </div>
+            <div class="row py-1">
+                <div class="col-md-2">
+                    <label class="float-md-end" for="a_images">Upload Images</label>
+                </div>
+                <div class="col-md-4">
+                    <input multiple type="file" name="images" class="form-control" id="a_images"
+                    >
+                </div>
+            </div>
+        </div>`
+            ids.insertAdjacentHTML("beforebegin", htm)
+        }
+        else if (x == "2") {
+
+            let htm = `<div class="removeele"><div class="row py-1">
+                <div class="col-md-2">
+                    <label name="m_name" class="float-md-end" for="m_name">Name</label>
+                </div>
+                <div class="col-md-4">
+                    <input name="m_name" type="text" class="form-control" id="m_name"
+                        aria-describedby="emailHelp">
+                </div>
+                <div class="col-md-2">
+                    <label  class="float-md-end" for="m_cost">Cost</label>
+                </div>
+                <div class="col-md-4">
+                    <input name="m_cost" type="number" class="form-control" id="m_cost"
+                        aria-describedby="emailHelp">
+                </div>
+            </div>
+            <div class="row py-1">
+                <div class="col-md-2">
+                    <label class="float-md-end" for="m_material">Material</label>
+                </div>
+                <div class="col-md-4">
+                    <input name="m_material" type="text" class="form-control" id="m_material"
+                        aria-describedby="emailHelp">
+                </div>
+                <div class="col-md-2">
+                    <label class="float-md-end" for="m_color">Color</label>
+                </div>
+                <div class="col-md-4">
+                    <input name="m_color" type="text" class="form-control" id="m_color"
+                        aria-describedby="emailHelp">
+                </div>
+            </div>
+            <div class="row py-1">
+                <div class="col-md-2">
+                    <label class="float-md-end" for="m_type">Type</label>
+                </div>
+                <div class="col-md-4">
+                    <select name="m_type" class="custom-select form-control dropdown" id="m_type">
+                    <option selected>Select Type</option>
+                    <option value="1">Electric</option>
+                    <option value="2">Acoustic </option>
+                    <option value="3">Semi-Acoustic</option>
+                </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="float-md-end" for="m_quantity">Quantity</label>
+                </div>
+                <div class="col-md-4">
+                    <input name="m_quantity" type="number" class="form-control" id="m_quantity"
+                        aria-describedby="m_quantity"> 
+                </div>
+
+            </div>
+            <div class="row py-1">
+                <div class="col-md-2">
+                    <label class="float-md-end" for="m_images">Upload Images</label>
+                </div>
+                <div class="col-md-4">
+                    <input multiple type="file" name="m_images" class="form-control" id="m_images">
+                </div>
+                
+            </div>
+        </div>`
+            ids.insertAdjacentHTML("afterend", htm)
+        }
+        else if (x == "3") {
+            var htm = `<div class="removeele"><h2>3</h2></div>`;
+            ids.insertAdjacentHTML("afterend", htm)
+        }
+        else {
+            let htm = ``;
+        }
+    }
+</script>
+
+
+<section>
+    <div class="container">
+        <div class="card m-5">
+            <div class="card-header text-center">Add New Product</div>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="p-5">
+
+                    <div class="row py-1">
+                        <div class="col-md-2">
+                            <label class="float-md-end" for="exampleInputEmail1" style="white-space: nowrap;">Category
+                            </label>
+                        </div>
+                        <div class="col-md-10">
+                            <!-- <input type="dropdown" class="form-co.ntrol" id="exampleInputEmail1"> -->
+                            {{form.category}}
+                            <select name="category" class="custom-select form-control" id="myselect"
+                                onchange="appendData1(this.value);">
+                                <option selected>Select Product Category</option>
+                                <option value="1">Cell Phone & Accessories</option>
+                                <option value="2">Musical Instruments </option>
+                                <option value="3">Clothing, Shoes & Jewelry</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="id" class="col-md-12">
+
+
+
+                        <!-- ======================================= -->
+                    </div>
+                    <div class="row py-1">
+                        <div class="col-md-2">
+                            <label class="float-end" for="exampleInputEmail1"
+                                style="white-space: nowrap;">Description</label>
+                        </div>
+                        <div class="col-md-10">
+                            <textarea class="form-control" name="description" id="product_detail_id" cols="30"
+                                rows="3"></textarea>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <button type="submit" class="btn btn-primary float-end">Add Product</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+
+
+</section>
+
+{% endblock %}

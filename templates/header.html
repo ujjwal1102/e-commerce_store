@@ -1,0 +1,144 @@
+<style>
+    .my-badge {
+        position: absolute;
+        background: #343a40;
+        color: white;
+        padding: 0px 5px 0px 5px;
+        font-size: small;
+        border: 1.5px solid white;
+
+        border-radius: 50%;
+        top: -7px;
+        right: 0;
+    }
+</style>
+
+<header >
+    <!-- Jumbotron -->
+    <div class="p-3 text-center border-bottom  bg-dark text-white ">
+        <div class="container">
+            <div class="row gy-3">
+                <!-- Left elements -->
+                <div class="col-lg-2 col-sm-4 col-4">
+                    <a href="#" target="_blank" class="float-start nav-link">
+                        <!-- <img src="https://mdbootstrap.com/img/logo/mdb-transaprent-noshadows.png" height="35" /> -->
+                        <h5 class="text-white"> MyStore</h5>
+                    </a>
+                </div>
+                <!-- Left elements -->
+
+                <!-- Center elements -->
+                <div class="order-lg-last col-lg-5 col-sm-8 col-8">
+                    <div class="d-flex float-end">
+
+                        {% if not user.is_authenticated and user.is_anonymous %}
+                        <!-- <button class="btn btn-dark btn-outline-light ">Hello</button> -->
+                        <a href="{% url 'accounts' %}" class="nav-link">
+                            <button class="me-1 btn btn-dark btn-outline-light rounded-3 p-1 d-flex align-items-center">
+                                <small><i class="fa-solid fa-user  m-1 me-md-2"></i></small>
+                                <p class="d-none d-md-block mb-0 " style="white-space: nowrap;"><small> Accounts Sign
+                                        Up</small></p>
+                            </button>
+                            <!-- <a href="#" class="nav-link" target="blank">
+                                <button
+                                    class="me-1 btn btn-dark btn-outline-light rounded-3 p-1  d-flex align-items-center">
+                                    <small><i class="fa-solid fa-user-plus m-1 me-md-2"></i></small>
+                                    <p class="d-none d-md-block mb-0" style="white-space: nowrap;"><small> Sign Up</small>
+                                    </p>
+                                </button>
+                            </a>
+                            <a href="#" class="nav-link" target="blank">
+                                <button
+                                    class="me-1 btn btn-dark btn-outline-light rounded-3 p-1  d-flex align-items-center">
+                                    <small><i class="fa-solid fa-arrow-right-to-bracket m-1 me-md-2"></i></small>
+                                    <p class="d-none d-md-block mb-0" style="white-space: nowrap;"><small>Login</small></p>
+                                </button>
+                            </a> -->
+                        </a>
+                        <a href="{% url 'login' %}" class="nav-link">
+                            <button
+                                class="me-1 btn btn-dark btn-outline-light rounded-3 p-1  d-flex align-items-center">
+                                <small><i class="fa-solid fa-right-to-bracket  m-1 me-md-2"></i></small>
+                                <p class="d-none d-md-block mb-0 " style="white-space: nowrap;"><small>Login</small>
+                                </p>
+                            </button>
+                        </a>
+
+
+                        {% else %}
+
+                        <a class="nav-link px-1" href="{% url 'wishlist' %}" >
+                            <button class="btn btn-dark btn-outline-light rounded-3  px-2 d-flex align-items-center"
+                                target="_self">
+                                <i class="fas fa-heart m-1 me-md-2 " aria-hidden="true"></i>
+                                <small>
+                                    <p class="d-none d-md-block mb-0">Wishlist</p>
+                                </small>
+                                <!-- {% if products %}
+                                <span class="my-badge">
+                                    <small>{{wishlist}}</small>
+                                </span>
+                                {% endif %} -->
+                            </button>
+                        </a>
+                        <a class="nav-link px-1 " href="{% url 'cart' %}" style="position: relative;">
+                            <button class="btn btn-dark btn-outline-light rounded-3  px-2  d-flex align-items-center"
+                                target="_self">
+                                <i class="fas fa-shopping-cart m-1 me-md-2"></i>
+                                <small>
+                                    <p class="d-none d-md-block mb-0">My cart</p>
+                                </small>
+                                <!-- <span
+                                    class="position-absolute top-0 start-100 translate-middle rounded-circle px-1 badge badge-dark">
+                                    <small>10</small>
+                                </span> -->
+
+                                {% if 'cart' in request.session %}
+                                <span class="my-badge">
+                                    <small>{{request.session.cart.keys|length}}</small>
+                                </span>
+                                {% endif %}
+                            </button>
+
+                        </a>
+
+
+                        <a class="nav-link px-1" href="{% url 'profile' %}">
+                            <button class="btn btn-dark btn-outline-light rounded-3" title="{{user.username}}">
+                                <i class="fa fa-user " aria-hidden="true"></i>
+                            </button>
+                        </a>
+                        <a class="nav-link px-1" href="{% url 'logout' %}">
+                            <button class="btn btn-dark btn-outline-light rounded-3" title="Logout">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            </button>
+                        </a>
+
+
+
+
+                        {% endif %}
+                    </div>
+                </div>
+                <!-- Center elements -->
+
+                <!-- Right elements -->
+                <div class="col-lg-4 col-md-12 col-sm-12 col-12">
+
+                    <form action="{% url 'search_results' %}" method="get">
+                        <div class="d-flex col-md-12 col-sm-12 ">
+                            <input type="search" name="q" id="q" class="form-control rounded-3" placeholder="Search" />
+                            <!-- <label class="form-label" for="form1">Search</label> -->
+                            <button type="submit" class="btn btn-primary shadow-0">
+                                <i class="fas fa-search"></i>
+                            </button>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include 'navbar.html' %}
+</header>

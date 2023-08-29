@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    #qwer {
+        display: flex;
+        flex-direction: column;
+        margin-top: 1%;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #rowAdder {
+        margin-left: 17px;
+    }
+</style>
+<h2 style="color:green">GeeksforGeeks</h2>
+<strong> Adding and Deleting Input fields Dynamically</strong>
+
+<div id="qwer">
+    <form method="post" id="form">
+        {% csrf_token %}
+        <div class="">
+            <div class="col-lg-12">
+                <div id="row">
+                    <div class="input-group m-3">
+                        <div class="input-group-prepend">
+                            <button class="btn btn-danger" id="DeleteRow" type="button">
+                                <i class="bi bi-trash"></i>
+                                Delete
+                            </button>
+                        </div>
+                        <input type="text" name="datafield" id="datafield" class="form-control m-input">
+                    </div>
+                </div>
+
+                <div id="newinput"></div>
+                <button id="rowAdder" type="button" class="btn btn-dark">
+                    <span class="bi bi-plus-square-dotted">
+                    </span> ADD
+                </button>
+            </div>
+        </div>
+        <!-- <button  class="btn btn-primary">Submit</button> -->
+        <div class="m-3">
+            <input class=" align-right btn btn-primary submit-btn " type="submit" value="Submit">
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    var idx = 1
+    $("#rowAdder").click(function () {
+        newRowAdd =
+            '<div id="row"> <div class="input-group m-3">' +
+            '<div class="input-group-prepend">' +
+            '<button class="btn btn-danger" id="DeleteRow" type="button">' +
+            '<i class="bi bi-trash"></i> Delete</button> </div>' +
+            `<input type="text" name="datafield` + idx + `" class="form-control m-input"> </div> </div>`;
+
+        $('#newinput').append(newRowAdd);
+        idx = idx + 1
+    });
+    $("body").on("click", "#DeleteRow", function () {
+        $(this).parents("#row").remove();
+    })
+    $('#form').on('submit', function (e) {
+        e.preventDefault();
+        let formdata = [];
+        var x = $("input[type='text']");
+        $.each(x, function (i, field) {
+            if (field.value != '') {
+                formdata.push(field.name + ":" + field.value)
+            }
+        });
+        console.log(formdata)
+        $.ajax({
+            type: "POST",
+            url: "{% url 'dynamic' %}",
+            data: {
+                name: $('#datafield').val(),
+                mydata: JSON.stringify({ 'formdata': formdata }),
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                dataType: 'json',
+            },
+            success: function (data) {
+                $('#output').html(data.msg) /* response message */
+            },
+            failure: function () {
+            }
+        });
+    });
+</script>
+
+{% endblock %}

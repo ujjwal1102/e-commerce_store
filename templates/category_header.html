@@ -1,0 +1,30 @@
+<section class="container">
+    <div class="row">
+        <div class="text-center">
+            <div class="d-flex align-item-end">
+                <a href="{% url 'create_category' %}"><button
+                        class="btn btn-sm btn-outline-dark rounded-3  d-flex align-items-center mx-1"><i
+                            class="fa-solid fa-user  m-1 me-md-2"></i>
+                        <p class="d-none d-md-block mb-0 " style="white-space: nowrap;"><small>Add Category </small></p>
+                    </button>
+                </a>
+                <a href="{% url 'create_child_category' %}"><button
+                        class="btn btn-sm btn-outline-dark rounded-3  d-flex align-items-center mx-1"><i
+                            class="fa-solid fa-user  m-1 me-md-2"></i>
+                        <p class="d-none d-md-block mb-0 " style="white-space: nowrap;"><small>Add Child Category
+                            </small>
+                        </p>
+                    </button>
+                </a>
+                <a href="{% url 'create_grant_child_category' %}"><button
+                        class="btn btn-sm btn-outline-dark rounded-3  d-flex align-items-center mx-1"><i
+                            class="fa-solid fa-user  m-1 me-md-2"></i>
+                        <p class="d-none d-md-block mb-0 " style="white-space: nowrap;"><small>Add Grant Child
+                                Category</small>
+                        </p>
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
