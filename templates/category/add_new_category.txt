@@ -1,0 +1,221 @@
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // ###################################################################
+        function createDynamicDropdown(response) {
+            var newSelectLabel = document.createElement('label');
+            newSelectLabel.id = 'select-child-category-label';
+            newSelectLabel.name = 'select-child-category-label';
+            newSelectLabel.className = 'form-label ';
+
+            var newSelect = document.createElement("select");
+            newSelect.id = "select-child-category"; // Set the id of the new select
+            newSelect.name = "select-child-category"; // Set the name of the new select
+            newSelect.className = "form-select my-2";
+
+            var defaultOption = document.createElement("option");
+            defaultOption.value = null;
+            defaultOption.disabled = true;
+            defaultOption.text = "Select Child Category";
+            newSelect.appendChild(defaultOption);
+
+
+            var newScript = document.createElement("script");
+
+            // Set the script content
+            newScript.innerHTML = `
+            var selectElement = document.querySelector("#` + newSelect.id + `");
+            selectElement.addEventListener("change", function () {
+    
+                var selectedValue = selectElement.value;
+                var formData = new FormData();
+                formData.append("selected_value", selectedValue);
+                $.ajax({
+                    headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                    url: "{% url 'filter_category_from_database' %}",
+                    type: 'POST',
+                    data: formData,
+                    dataType: 'json', // Set the expected data type
+    
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        console.log(response);
+                        createDynamicDropdown(response)
+                    },
+                    error: function (response) {
+                        console.error(response);
+                    }
+                });
+            });`;
+
+
+            // Append the new script element to the document's body
+            document.body.appendChild(newScript);
+            // Loop through the response and add child categories as options
+
+
+            for (var x in response) {
+                var option = document.createElement("option");
+                option.value = x['id'];
+                option.text = response[x]['category_name'];
+                newSelect.appendChild(option);
+                console.log(x);
+            }
+            var container = document.querySelector('#child-categories');
+            container.appendChild(newSelect);
+        }
+        //#######################################################
+
+        var selectElement = document.querySelector("#parent-categories");
+        selectElement.addEventListener("change", function () {
+
+            var selectedValue = selectElement.value;
+            var formData = new FormData();
+            formData.append("selected_value", selectedValue);
+            $.ajax({
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                url: "{% url 'filter_category_from_database' %}",
+                type: 'POST',
+                data: formData,
+                dataType: 'json', // Set the expected data type
+
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    console.log(response);
+                    createDynamicDropdown(response)
+                },
+                error: function (response) {
+                    console.error(response);
+                }
+            });
+        });
+    });
+</script>
+
+
+
+<div class="container">
+    <form method="POST" enctype="multipart/form-data">
+
+        <!-- Security token -->
+        {% csrf_token %}
+
+        <!-- Using the formset -->
+        <!-- {{ form.as_p }} -->
+        <div class="d-flex justify-content-center">
+            <div class="card">
+
+                <div class="card-body">
+                    <div class="mb-2">
+                        <h3>Create Category</h3>
+                    </div>
+                    <div class="row">
+                        <!-- <div class="col">
+                            <label for="form-label my-1">Select Category</label>
+                            {% if categories %}
+
+
+                            <select id="parent-categories" name="parent-categories" class="form-select">
+                                {% for category in categories %}
+                                <option value="{{category.id}}">{{category.category_name}}</option>
+                                {% endfor %}
+                                <option value="saab">Saab</option>
+                                <option value="fiat">Fiat</option>
+                                <option value="audi">Audi</option>
+                            </select>
+                            {% endif %}
+                            <div id="child-categories">
+
+                            </div>
+                        </div> -->
+
+                    </div>
+
+                    <input type="submit" value="Submit" class="btn btn-sm btn-dark my-1 mt-5">
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    // Sample data
+    var categoriesData = {{ categories_dict | safe }};
+    console.log(categoriesData)
+    // Function to create the dynamic select dropdown
+    function createDynamicDropdown(data, parentId, selectElement) {
+        data.forEach(function (category) {
+            // Check if the category matches the parentId
+            if (category.parent_id && category.parent_id.id === parentId) {
+                var option = document.createElement("option");
+                option.value = category.id;
+                option.text = category.category_name;
+                selectElement.appendChild(option);
+
+                // Recursively call the function to handle nested categories
+                createDynamicDropdown(data, category.id, selectElement);
+            }
+        });
+    }
+
+    // Get a reference to the select element
+    var categorySelect = document.getElementById("category-select");
+
+    // Create the dynamic select dropdown starting from the top-level categories (parentId = null)
+    createDynamicDropdown(categoriesData, null, categorySelect);
+</script>

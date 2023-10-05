@@ -1,17 +1,47 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-<div class="container">
-    <form method="POST" enctype="multipart/form-data">
 
-        <!-- Security token -->
-        {% csrf_token %}
 
-        <!-- Using the formset -->
-        {{ form.as_p }}
+{{categories_dict}}
+<p>{{categories_json}}</p>
 
-        <input type="submit" value="Submit">
-    </form>
+
+<div class="container py-5">
+
+    <label for="form-label my-1">Select Category</label>
+    {% if categories %}
+
+
+
+    {% for category in categories %}
+    <div class="card border-0 shadow-sm rounded-0 my-2">
+        <div class="card-body">
+            <div class="d-flex justify-content-between my-auto">
+                <div class="d-flex">
+                    <div class="ms-2 mx-3">
+                        <input type="radio" name="catrgory-radio" id="{{category.id}}"
+                            class="form-check-input shadow-sm">
+                    </div>
+                    <div class="mx-1">
+                        <p class="mb-1">{{category.category_name}}</p>
+                    </div>
+                </div>
+                <div class="">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    {% endfor %}
+
+    </select>
+    {% endif %}
+    </select>
 </div>
+
+
 
 {% endblock %}

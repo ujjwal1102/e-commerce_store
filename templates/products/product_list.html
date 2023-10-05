@@ -16,7 +16,7 @@
                     console.log(response.status, response.prod_id)
                     var element = document.getElementById("prod_btn" + response.prod_id);
                     console.log(element)
-                    
+
                     var prod_icon = element.getElementsByTagName("i")
                     if (response.status == 'bi-heart-fill') {
                         prod_icon[0].classList.remove("bi-heart")
@@ -56,9 +56,9 @@
 <script>
     $(document).ready(function () {
 
-        $('form#add_item_to_cart').submit( function (e) {
+        $('form#add_item_to_cart').submit(function (e) {
             e.preventDefault();
-var cartcount = document.getElementById('cartviewcount')
+            var cartcount = document.getElementById('cartviewcount')
             var data = $(this).serialize();
             console.log(data)
             $.ajax({
@@ -130,7 +130,7 @@ var cartcount = document.getElementById('cartviewcount')
                     <div class="d-flex justify-content-between px-2 py-0">
                         <div>
                             <div class="input-group input-group-sm mb-3">
-                                <button id="minusBtn" {% if prod.id in request.session.mycart.keys %} disabled {% endif %}
+                                <button id="minusBtn" {% if prod.id in request.session.mycart.keys %} disabled {% endif %} 
                                 class="btn btn-outline-dark  btn-sm  py-1 px-2 minus" type="button"
                                     data-mdb-ripple-color="dark">
                                     <i class="fas fa-minus"></i>
@@ -140,9 +140,8 @@ var cartcount = document.getElementById('cartviewcount')
                                     class="form-control form-control-sm text-center border border-secondary count"
                                     value="1" style="max-width: 40px; min-width:25px; width:max-content;" />
                                 <input type="text" name="product_id" hidden value="{{prod.id}}">
-                                <button id="plusBtn" {% if prod.id in request.session.mycart.keys %} disabled {% endif %}
-                                
-                                 class="btn btn-outline-dark btn-sm py-1 px-2 plus" type="button"
+                                <button id="plusBtn" {% if prod.id in request.session.mycart.keys %} disabled {% endif %} 
+                                class="btn btn-outline-dark btn-sm py-1 px-2 plus" type="button"
                                     data-mdb-ripple-color="dark">
                                     <small><i class="fas fa-plus"></i></small>
                                 </button>
@@ -150,8 +149,8 @@ var cartcount = document.getElementById('cartviewcount')
                         </div>
                         {%if request.session.mycart.keys == prod.id %}True{% else %}false{% endif %}
                         <div class="">
-                            <button type="submit" id="addtocart" {% if prod.id in request.session.mycart.keys %} disabled {% endif %}
-                                class="btn btn-primary shadow-0 me-1 btn-sm " title="Add to cart"
+                            <button type="submit" id="addtocart" {% if prod.id in request.session.mycart.keys %}
+                                disabled {% endif %} class="btn btn-primary shadow-0 me-1 btn-sm " title="Add to cart"
                                 style="white-space: nowrap;">Add to Cart
                             </button>
                         </div>
@@ -161,6 +160,89 @@ var cartcount = document.getElementById('cartviewcount')
         </div>
         {% endfor %}
     </div>
-</div>
+    <div class="col col-md-3">
+        <div class="card my-2 shadow-0 product-card">
 
+            <a href="#">
+                <!-- <div class="mask" >
+                        <div class="d-flex justify-content-start align-items-start ">
+                            <h6><span class="badge pt-1" style="background-color: #f87217;">Offer</span></h6>
+                        </div>
+                    </div> -->
+                <img src="#" class="card-img-top rounded-2" style="aspect-ratio: 1 / 1" height="250px" />
+            </a>
+            <div>
+                <form id="add_item_to_wishlist" method="post">
+                    {% csrf_token %}
+
+                    <button type="submit" class="btn btn-outline-danger border-0 px-2 float-end heart-icon"
+                        id="prod_btn" style="background:none;color:#d4403a"><i class="bi bi-heart-fill"></i></button>
+
+                    <button type="submit" class="btn btn-outline-danger border-0 px-2 float-end heart-icon"
+                        id="prod_btn" style="background:none;color:#d4403a"><i class=" bi bi-heart"></i></button>
+                    <input name="product_id" type="hidden" value="">
+                </form>
+            </div>
+            <div class="card-body pt-2 py-0">
+                <a href="" class="nav-link">
+                    <h5 class="card-title"><span>&#8377</span>7392</h5>
+                    <p class="card-text mb-0">Mobile nb</p>
+                    <p class="text-muted small">
+                        <small>jnaljnwlf</small>
+                    </p>
+                </a>
+            </div>
+            <form id="add_item_to_cart" action="{% url 'my_cart_add' %}" method="post">
+                {% csrf_token %}
+                <div class="d-flex justify-content-between px-2 pb-2" id="addtocardplace">
+
+                    <button type="submit" id="addtocart1" class="btn btn-primary  btn-sm w-100  " title="Add to cart"
+                        style="white-space: nowrap;">Add to Cart
+                    </button>
+                </div>
+            </form>
+        </div>
+        <script>
+            addtocart1 = document.getElementById("addtocart1")
+            addtocardplace = document.getElementById("addtocardplace")
+            removefromcart = document.getElementById("removefromcart")
+            
+            
+            
+            
+            
+            addtocart1.onclick = function () {
+                addtocardplace.innerHTML = `<div class="input-group input-group-sm">
+                    <button   
+                    class="btn bg-danger  " type="button"
+                        id='removefromcart'>
+                        <span>
+                        Remove</span>
+                    </button>
+                    <button id="minusBtn"  
+                    class="btn w-25  bg-secondary  " type="button"
+                        data-mdb-ripple-color="dark">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <input readonly
+                        type="text" name="quantity" id="count"
+                        class="form-control text-center "
+                        value="1"  />
+                    <input type="text" name="product_id" hidden value="">
+                    <button id="plusBtn" 
+                    class="btn w-25 bg-secondary" type="button"
+                        data-mdb-ripple-color="dark">
+                        <small><i class="fas fa-plus"></i></small>
+                    </button>
+                </div>`
+            }
+
+            removefromcart.onclick = function() {
+                addtocardplace.innerHTML = `<button type="submit" id="addtocart1" class="btn btn-primary  btn-sm w-100  " title="Add to cart"
+                style="white-space: nowrap;">Add to Cart
+            </button>`
+            }
+        </script>
+    </div>
+</div>
 {% endblock %}
