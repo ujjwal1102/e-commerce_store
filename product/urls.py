@@ -1,10 +1,16 @@
 
 from django.urls import path
 from . import views
-from django.urls import path, include,re_path
+# from django.urls import path, include,re_path
 
 urlpatterns = [
-    path('add-product-view',views.AddProductView.as_view(),name='add_prod'),
-    path('all-product-view',views.ProductListView.as_view(),name='all_prod'),
-    path('product-detail-view/<pk>',views.ProductDetailView.as_view(),name='prod_detail'),
-    ]
+    path('products', view=views.ProductsAPIView.as_view()),
+    path('seller/products', view=views.SellerProductListAPIView.as_view()),
+    path('seller/products', view=views.SellerProductUpdateAPIView.as_view()),
+    path('seller/product/<int:pk>',
+         view=views.SellerProductRetrieveAPIView.as_view()),
+    path('product/<int:pk>', views.ProductRetrieveAPIView.as_view()),
+    path('shop', view=views.ShopView.as_view()),
+    path('homeshop',views.HomeShopAPIView.as_view()),
+    path('shop/<int:id>',views.ShopCategoryAPIView.as_view()),
+]

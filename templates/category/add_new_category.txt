@@ -1,149 +1,191 @@
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-
-        // ###################################################################
-        function createDynamicDropdown(response) {
-            var newSelectLabel = document.createElement('label');
-            newSelectLabel.id = 'select-child-category-label';
-            newSelectLabel.name = 'select-child-category-label';
-            newSelectLabel.className = 'form-label ';
-
-            var newSelect = document.createElement("select");
-            newSelect.id = "select-child-category"; // Set the id of the new select
-            newSelect.name = "select-child-category"; // Set the name of the new select
-            newSelect.className = "form-select my-2";
-
-            var defaultOption = document.createElement("option");
-            defaultOption.value = null;
-            defaultOption.disabled = true;
-            defaultOption.text = "Select Child Category";
-            newSelect.appendChild(defaultOption);
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
 
 
-            var newScript = document.createElement("script");
+<!-- {{da_json|safe}} -->
+<!-- <p>{{categories_json}}</p> -->
 
-            // Set the script content
-            newScript.innerHTML = `
-            var selectElement = document.querySelector("#` + newSelect.id + `");
-            selectElement.addEventListener("change", function () {
-    
-                var selectedValue = selectElement.value;
-                var formData = new FormData();
-                formData.append("selected_value", selectedValue);
-                $.ajax({
-                    headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-                    url: "{% url 'filter_category_from_database' %}",
-                    type: 'POST',
-                    data: formData,
-                    dataType: 'json', // Set the expected data type
-    
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        console.log(response);
-                        createDynamicDropdown(response)
-                    },
-                    error: function (response) {
-                        console.error(response);
+
+<div class="container py-5">
+
+    <label for="d-flex justify-content-center">
+        <h4 class="form-label my-1">Select Category</h4>
+    </label>
+
+
+    <style>
+        .tree {
+            padding-left: 20px;
+        }
+
+        li {
+            list-style: none;
+        }
+
+        .tree-item {
+            cursor: pointer;
+        }
+
+        .add-button {
+            display: none;
+        }
+    </style>
+    <div class="form-view">
+       
+            <div id="tree-container" class="py-5">
+
+
+            </div>
+
+
+    </div>
+
+    <script>
+        const data = {{ da_json | safe}};
+
+        const treeContainer = document.getElementById('tree-container');
+        let activeInput = null;
+
+        if (treeContainer) {
+            createTree(data, treeContainer);
+        } else {
+            console.error("Tree container not found");
+        }
+        function createTree(data, parentElement) {
+            const ul = document.createElement('ul');
+            ul.classList.add('d-none'); // Initially hide the root ul
+
+            for (const item of data) {
+                const li = document.createElement('li');
+                li.classList.add('tree-item');
+
+                let html = `<div class="card border-0 shadow-sm rounded-0 my-2">
+                    <div class="d-flex">
+                    <div class="m-auto  mx-3">
+                        <input type="radio" name="category-radio" id="${item.id}" class="form-check-input shadow-sm">
+                    </div>
+                    <div class="card-body category-card" id="card-${item.id}"">
+                        <div class="d-flex  my-auto justify-content-between">
+                            <div class="d-flex">
+                                
+                                <div class="mx-1">
+                                    <p class="mb-1">${item.category_name}</p>
+                                </div>
+                            </div>
+                            <div class="d-flex" >
+                                <small><button class="add-button btn btn-sm btn-secondary mx-3 py-0" data-id="${item.id}">Add</button></small>
+                            <div class="arrow-icon ">${Object.keys(item.children).length > 0 ? '<i class="fas fa-arrow-right"></i>' : ''}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>`;
+
+                li.innerHTML = html;
+
+                if (Object.keys(item.children).length > 0) {
+                    // If item has children, create a sub-tree for them
+                    const subTree = createTree(Object.values(item.children), li);
+                    li.appendChild(subTree);
+                }
+
+                ul.appendChild(li);
+
+                // Add click event to show/hide children
+                li.querySelector('.category-card').addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent parent click event
+                    const subTree = li.querySelector('ul');
+                    if (subTree) {
+                        subTree.classList.toggle('d-none');
+                        const arrowIcon = li.querySelector('.arrow-icon i');
+                        if (arrowIcon) {
+                            arrowIcon.className = subTree.classList.contains('d-none') ? 'fas fa-arrow-right' : 'fas fa-arrow-down';
+                        }
                     }
                 });
-            });`;
 
+                const addButton = li.querySelector('.add-button');
+                const cardBody = li.querySelector('.category-card');
 
-            // Append the new script element to the document's body
-            document.body.appendChild(newScript);
-            // Loop through the response and add child categories as options
+                // Show the button on hover
+                cardBody.addEventListener('mouseenter', () => {
+                    addButton.style.display = 'inline-block';
+                });
 
+                cardBody.addEventListener('mouseleave', () => {
+                    addButton.style.display = 'none';
+                });
 
-            for (var x in response) {
-                var option = document.createElement("option");
-                option.value = x['id'];
-                option.text = response[x]['category_name'];
-                newSelect.appendChild(option);
-                console.log(x);
+                // Add click event to show input field when the button is clicked
+                addButton.addEventListener('click', (e) => {
+                    if (activeInput) {
+                        // If there's an active input, remove it
+                        activeInput.remove();
+                    }
+        
+                    // Create a form element
+                    const formElement = document.createElement('form');
+                    formElement.action = "{% url 'my_categories' %}"; // Replace with the actual URL
+                    formElement.method = 'post';
+                    formElement.className = 'd-flex mt-1'
+                    formElement.innerHTML = '{% csrf_token %}'; // Add the CSRF token
+                    const submitButton = document.createElement('button');
+                    submitButton.type = 'submit';
+                    submitButton.className = 'btn btn-success mx-2';
+                    submitButton.innerText = 'Submit';
+                    
+        
+                    // Create an input field
+                    const inputField = document.createElement('input');
+                    inputField.type = 'text';
+                    inputField.name = 'category_name';
+                    inputField.className = 'form-control category-name-input';
+        
+                    // Append the input field and the form
+                    cardBody.appendChild(formElement);
+                    formElement.appendChild(inputField);
+                    formElement.appendChild(submitButton);
+        
+                    activeInput = inputField;
+                });
             }
-            var container = document.querySelector('#child-categories');
-            container.appendChild(newSelect);
+
+            parentElement.appendChild(ul);
+
+            return ul;
+
+
         }
-        //#######################################################
 
-        var selectElement = document.querySelector("#parent-categories");
-        selectElement.addEventListener("change", function () {
-
-            var selectedValue = selectElement.value;
-            var formData = new FormData();
-            formData.append("selected_value", selectedValue);
-            $.ajax({
-                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-                url: "{% url 'filter_category_from_database' %}",
-                type: 'POST',
-                data: formData,
-                dataType: 'json', // Set the expected data type
-
-                processData: false,
-                contentType: false,
-                success: function (response) {
-                    console.log(response);
-                    createDynamicDropdown(response)
-                },
-                error: function (response) {
-                    console.error(response);
-                }
-            });
+        // Show the root ul when the page is loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            const rootUL = treeContainer.querySelector('ul');
+            if (rootUL) {
+                rootUL.classList.remove('d-none');
+            }
         });
-    });
-</script>
+
+        //// Add a global click event listener to close input fields when clicking outside
+        //document.addEventListener('click', (e) => {
+        //    const inputFields = document.querySelectorAll('.category-name-input');
+        //    for (const inputField of inputFields) {
+        //        if (e.target !== inputField) {
+        //            inputField.remove();
+        //        }
+        //    }
+        //});
+
+    </script>
 
 
 
-<div class="container">
-    <form method="POST" enctype="multipart/form-data">
-
-        <!-- Security token -->
-        {% csrf_token %}
-
-        <!-- Using the formset -->
-        <!-- {{ form.as_p }} -->
-        <div class="d-flex justify-content-center">
-            <div class="card">
-
-                <div class="card-body">
-                    <div class="mb-2">
-                        <h3>Create Category</h3>
-                    </div>
-                    <div class="row">
-                        <!-- <div class="col">
-                            <label for="form-label my-1">Select Category</label>
-                            {% if categories %}
-
-
-                            <select id="parent-categories" name="parent-categories" class="form-select">
-                                {% for category in categories %}
-                                <option value="{{category.id}}">{{category.category_name}}</option>
-                                {% endfor %}
-                                <option value="saab">Saab</option>
-                                <option value="fiat">Fiat</option>
-                                <option value="audi">Audi</option>
-                            </select>
-                            {% endif %}
-                            <div id="child-categories">
-
-                            </div>
-                        </div> -->
-
-                    </div>
-
-                    <input type="submit" value="Submit" class="btn btn-sm btn-dark my-1 mt-5">
-                </div>
-            </div>
-        </div>
-
-    </form>
 </div>
 
 
 
 
+{% endblock %}
 
 
 
@@ -155,67 +197,210 @@
 
 
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
 
 
+<!-- {{da_json|safe}} -->
+<!-- <p>{{categories_json}}</p> -->
 
 
+<div class="container py-5">
+
+    <label for="d-flex justify-content-center">
+        <h4 class="form-label my-1">Select Category</h4>
+    </label>
 
 
+    <style>
+        .tree {
+            padding-left: 20px;
+        }
+
+        li {
+            list-style: none;
+        }
+
+        .tree-item {
+            cursor: pointer;
+        }
+
+        .add-button {
+            display: none;
+        }
+    </style>
+    <div class="form-view">
+
+        <div id="tree-container" class="py-5">
 
 
+        </div>
 
 
+    </div>
 
+    <script>
+        const data = {{ da_json | safe }};
 
+        const treeContainer = document.getElementById('tree-container');
+        let activeInput = null;
 
+        if (treeContainer) {
+            createTree(data, treeContainer);
+        } else {
+            console.error("Tree container not found");
+        }
 
+        function createTree(data, parentElement) {
+            const ul = document.createElement('ul');
+            ul.classList.add('d-none'); // Initially hide the root ul
 
+            for (const item of data) {
+                const li = document.createElement('li');
+                li.classList.add('tree-item');
 
+                let html = `<div class="card border-0 shadow-sm rounded-0 my-2">
+                    <div class="d-flex">
+                        <div class="m-auto mx-3">
+                            <input type="radio" name="category-radio" id="${item.id}" class="form-check-input shadow-sm">
+                        </div>
+                        <div class="card-body category-card" id="card-${item.id}">
+                            <div class="d-flex my-auto justify-content-between">
+                                <div class="d-flex">
+                                    <div class="mx-1">
+                                        <p class="mb-1">${item.category_name}</p>
+                                    </div>
+                                </div>
+                                <div class="d-flex">
+                                    <small><button class="add-button btn btn-sm btn-secondary mx-3 py-0" data-id="${item.id}">Add</button></small>
+                                    <div class="arrow-icon">${Object.keys(item.children).length > 0 ? '<i class="fas fa-arrow-right"></i>' : ''}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
 
+                li.innerHTML = html;
 
+                if (Object.keys(item.children).length > 0) {
+                    // If item has children, create a sub-tree for them
+                    const subTree = createTree(Object.values(item.children), li);
+                    li.appendChild(subTree);
+                }
 
+                ul.appendChild(li);
 
+                // Add click event to show/hide children
+                li.querySelector('.category-card').addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent parent click event
+                    const subTree = li.querySelector('ul');
+                    if (subTree) {
+                        subTree.classList.toggle('d-none');
+                        const arrowIcon = li.querySelector('.arrow-icon i');
+                        if (arrowIcon) {
+                            arrowIcon.className = subTree.classList.contains('d-none') ? 'fas fa-arrow-right' : 'fas fa-arrow-down';
+                        }
+                    }
+                });
 
+                const addButton = li.querySelector('.add-button');
+                const cardBody = li.querySelector('.category-card');
 
+                // Show the button on hover
+                cardBody.addEventListener('mouseenter', () => {
+                    addButton.style.display = 'inline-block';
+                });
 
+                cardBody.addEventListener('mouseleave', () => {
+                    addButton.style.display = 'none';
+                });
 
+                // Add click event to show input field when the button is clicked
+                addButton.addEventListener('click', (e) => {
+                    if (activeInput) {
+                        // If there's an active input, remove it
+                        activeInput.remove();
+                    }
 
+                    // Create a form element
+                    const formElement = document.createElement('form');
+                    formElement.action = "{% url 'my_categories' %}"; // Replace with the actual URL
+                    formElement.method = 'post';
+                    formElement.className = 'd-flex mt-1 form-element';
+                    formElement.innerHTML = '{% csrf_token %}'; // Add the CSRF token
 
+                    const parentInputField = document.createElement('input');
+                    parentInputField.type = 'hidden';
+                    parentInputField.name = 'parent_id';
+                    parentInputField.value = item.id;
 
+                    const submitButton = document.createElement('button');
+                    submitButton.type = 'submit';
+                    submitButton.className = 'btn btn-success mx-2 ';
+                    submitButton.innerText = 'Submit';
 
+                    // Create an input field
+                    const inputField = document.createElement('input');
+                    inputField.type = 'text';
+                    inputField.name = 'category_name';
+                    inputField.className = 'form-control category-name-input';
 
+                    // Append the input field and the form
+                    formElement.appendChild(parentInputField);
+                    formElement.appendChild(inputField);
+                    formElement.appendChild(submitButton);
+                    cardBody.appendChild(formElement);
 
+                    activeInput = formElement;
 
+                    // Add an event listener for the input field
+                    inputField.addEventListener('input', () => {
+                        // Check if the input field is empty
+                        if (inputField.value.trim() === '') {
+                            submitButton.disabled = true; // Disable the button
+                        } else {
+                            submitButton.disabled = false; // Enable the button
+                        }
+                    });
+                }
+            )}
 
+            parentElement.appendChild(ul);
+            return ul;
+        }
 
-
-
-<script>
-    // Sample data
-    var categoriesData = {{ categories_dict | safe }};
-    console.log(categoriesData)
-    // Function to create the dynamic select dropdown
-    function createDynamicDropdown(data, parentId, selectElement) {
-        data.forEach(function (category) {
-            // Check if the category matches the parentId
-            if (category.parent_id && category.parent_id.id === parentId) {
-                var option = document.createElement("option");
-                option.value = category.id;
-                option.text = category.category_name;
-                selectElement.appendChild(option);
-
-                // Recursively call the function to handle nested categories
-                createDynamicDropdown(data, category.id, selectElement);
+        // Show the root ul when the page is loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            const rootUL = treeContainer.querySelector('ul');
+            if (rootUL) {
+                rootUL.classList.remove('d-none');
             }
         });
-    }
 
-    // Get a reference to the select element
-    var categorySelect = document.getElementById("category-select");
+        // Add a global click event listener to close input fields when clicking outside
+        document.addEventListener('click', (e) => {
+            const formElements = document.querySelectorAll('.form-element');
 
-    // Create the dynamic select dropdown starting from the top-level categories (parentId = null)
-    createDynamicDropdown(categoriesData, null, categorySelect);
-</script>
+            for (const formElement of formElements) {
+                if (e.target !== formElement && !formElement.contains(e.target)) {
+                    formElement.remove();
+                }
+            }
+        });
+    </script>
+
+
+
+
+
+</div>
+
+
+
+
+{% endblock %}

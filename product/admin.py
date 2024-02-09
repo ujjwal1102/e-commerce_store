@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product,ProductImages,Variant
+from .models import Product,ProductImages,Variant,Brand,ProductUtils
 # Register your models here.
 
 class ProductImagesAdmin(admin.ModelAdmin):
@@ -13,11 +13,14 @@ class ProductAdmin(admin.ModelAdmin):
 class VariantAdmin(admin.ModelAdmin):    
     list_display = ['product_id','details','cost','quantity']
 
+class BrandAdmin(admin.ModelAdmin):
+    list_display = ['brand_name']
 
 
 
 admin.site.register(Product,ProductAdmin)
 admin.site.register(ProductImages,ProductImagesAdmin)
 admin.site.register(Variant,VariantAdmin)
-
+admin.site.register(Brand,BrandAdmin)
+admin.site.register(ProductUtils)
 

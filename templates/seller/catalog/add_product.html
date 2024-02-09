@@ -1,0 +1,266 @@
+{% extends 'seller/homepage.html' %}
+
+{% block content %}
+<style>
+    .nav-link.active {
+        color: rgb(29, 18, 5) !important;
+        background-color: rgb(186, 240, 255) !important;
+    }
+</style>
+<div class="container">
+    <div class="row d-flex justify-content-center">
+        <div class="col-10 col-md-8 col-sm-10 col-lg-6 col-xl-6">
+            <section id="form_tabs">
+                <div class="my-2 ">
+                    <ul class="nav nav-pills nav-fill">
+                        <li class="nav-item ">
+                            <a class="nav-link active px-5  " aria-current="page" href="#">Info</a>
+                        </li>
+                        <li class="nav-item ">
+                            <a class="nav-link " href="#">Variation</a>
+                        </li>
+                        <li class="nav-item ">
+                            <a class="nav-link" href="#">Images</a>
+                        </li>
+                        <li class="nav-item ">
+                            <a class="nav-link disabled" aria-disabled="true">Description</a>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="row d-flex justify-content-center">
+        <div class="col-10 col-md-8 col-sm-10 col-lg-8 col-xl-8">
+            <div class="my-2">
+                <div id="add_product_form">
+
+                    <form class="">
+                        <!-- Form Name -->
+                        <legend class="text-center">Info</legend>
+
+                        <!-- Text input-->
+                        <!-- <div class="form-group">
+                            <label class="form-label" for="product_id">PRODUCT ID</label>
+                            <div class="form-input">
+                                <input id="product_id" name="product_id" placeholder="PRODUCT ID"
+                                    class="form-control     " required="" type="text">
+
+                            </div>
+                        </div> -->
+
+
+                        <!-- Text input-->
+                        <div class="form-group">
+                            <label class="form-label" for="product_name">Product Name</label>
+                            <div class="form-input">
+                                <input id="product_name" name="product_name" placeholder="PRODUCT NAME"
+                                    class="form-control " required="" type="text">
+
+                            </div>
+                        </div>
+
+                        <!-- Text input-->
+                        <div class="form-group">
+                            <label class="form-label" for="product_name_fr">Product Description FR</label>
+                            <div class="form-input">
+                                <input id="product_name_fr" name="product_name_fr" placeholder="PRODUCT DESCRIPTION FR"
+                                    class="form-control" required="" type="text">
+                            </div>
+                        </div>
+
+                        <!-- Select Basic -->
+                        <div class="form-group">
+                            <label class="form-label" for="product_categorie">Product Category</label>
+                            <div class="form-input ">
+                                <style>
+                                    option {
+                                        background-color: aquamarine;
+                                        border-radius: 50%;
+                                    }
+                                </style>
+                                <select id="product_categorie " name="product_categorie"
+                                    class="form-control form-select">
+                                    <option class="form-select-dropdown" value="">Electronics</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Text input-->
+                        <div class="form-group">
+                            <label class="form-label" for="available_quantity">Avilable Quantity</label>
+                            <div class="form-input">
+                                <input id="available_quantity" name="available_quantity"
+                                    placeholder="AVAILABLE QUANTITY" class="form-control     " required="" type="text">
+
+                            </div>
+                        </div>
+
+                        <!-- Text input-->
+                        <div class="form-group">
+                            <label class="form-label" for="product_weight">Product Weight</label>
+                            <div class="form-input">
+                                <input id="product_weight" name="product_weight" placeholder="PRODUCT WEIGHT"
+                                    class="form-control" type="text">
+
+                            </div>
+                        </div>
+
+
+
+                        <!-- Text input-->
+                        <div class="form-group">
+                            <label class="form-label" for="percentage_discount">Percentage Discount</label>
+                            <div class="form-input">
+                                <input id="percentage_discount" name="percentage_discount"
+                                    placeholder="PERCENTAGE DISCOUNT" class="form-control" required="" type="text">
+
+                            </div>
+                        </div>
+
+                        <!-- Text input-->
+                        <div class="form-group">
+                            <label class="form-label" for="stock_alert">Stock Alert</label>
+                            <div class="form-input">
+                                <input id="stock_alert" name="stock_alert" placeholder="STOCK ALERT"
+                                    class="form-control" required="" type="text">
+
+                            </div>
+                        </div>
+
+                        <!-- Search input-->
+                        <!-- <div class="form-group">
+                            <label class="form-label" for="stock_critical">STOCK CRITICAL</label>
+                            <div class="form-input">
+                                <input id="stock_critical" name="stock_critical" placeholder="STOCK CRITICAL"
+                                    class="form-control     " required="" type="search">
+
+                            </div>
+                        </div> -->
+
+                        <!-- Search input-->
+                        <!-- <div class="form-group">
+                            <label class="form-label" for="tutorial">TUTORIAL</label>
+                            <div class="form-input">
+                                <input id="tutorial" name="tutorial" placeholder="TUTORIAL" class="form-control     "
+                                    required="" type="search">
+
+                            </div>
+                        </div> -->
+
+                        <!-- Search input-->
+                        <!-- <div class="form-group">
+                            <label class="form-label" for="tutorial_fr">TUTORIAL FR</label>
+                            <div class="form-input">
+                                <input id="tutorial_fr" name="tutorial_fr" placeholder="TUTORIAL FR"
+                                    class="form-control     " required="" type="search">
+
+                            </div>
+                        </div> -->
+
+                        <!-- Text input-->
+                        <!-- <div class="form-group">
+                            <label class="form-label" for="online_date">ONLINE DATE</label>
+                            <div class="form-input">
+                                <input id="online_date" name="online_date" placeholder="ONLINE DATE"
+                                    class="form-control     " required="" type="text">
+
+                            </div>
+                        </div> -->
+
+                        <!-- Text input-->
+                        <!-- <div class="form-group">
+                            <label class="form-label" for="author">AUTHOR</label>
+                            <div class="form-input">
+                                <input id="author" name="author" placeholder="AUTHOR" class="form-control   "
+                                    required="" type="text">
+
+                            </div>
+                        </div> -->
+
+                        <!-- Text input-->
+                        <!-- <div class="form-group">
+                            <label class="form-label" for="enable_display">ENABLE DISPLAY</label>
+                            <div class="form-input">
+                                <input id="enable_display" name="enable_display" placeholder="ENABLE DISPLAY"
+                                    class="form-control     " required="" type="text">
+
+                            </div>
+                        </div> -->
+
+                        <!-- Text input-->
+                        <!-- <div class="form-group">
+                            <label class="form-label" for="comment">COMMENT</label>
+                            <div class="form-input">
+                                <input id="comment" name="comment" placeholder="COMMENT" class="form-control    "
+                                    required="" type="text">
+
+                            </div>
+                        </div> -->
+
+                        <!-- Text input -->
+                        <div class="form-group">
+                            <!-- <label class="form-label" for="approuved_by">APPROUVED BY</label>
+                            <div class="form-input">
+                                <input id="approuved_by" name="approuved_by" placeholder="APPROUVED BY"
+                                    class="form-control     " required="" type="text">
+                            </div> -->
+                            <!-- File Button -->
+                            <div class="form-group">
+                                <label class="form-label" for="filebutton">main_image</label>
+                                <div class="form-input">
+                                    <input id="filebutton" name="filebutton" class="input-file" type="file">
+                                </div>
+                            </div>
+                            <!-- File Button -->
+                            <div class="form-group">
+                                <label class="form-label" for="filebutton">auxiliary_images</label>
+                                <div class="form-input">
+                                    <input id="filebutton" name="filebutton" class="input-file" type="file" multiple>
+                                </div>
+                            </div>
+
+                            <!-- Button -->
+                            <!-- <div class="form-group">
+                                    <label class="form-label" for="singlebutton">Single Button</label>
+                                    <div class="form-input">
+                                        <button id="singlebutton" name="singlebutton"
+                                            class="btn btn-primary">Button</button>
+                                    </div>
+                                </div> -->
+                        </div>
+                        <!-- Textarea -->
+                        <div class="form-group">
+                            <label class="form-label" for="product_description">PRODUCT DESCRIPTION</label>
+                            <div class="form-input">
+                                <textarea class="form-control" id="product_description"
+                                    name="product_description"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Textarea -->
+                        <div class="form-group">
+                            <label class="form-label" for="product_name_fr">PRODUCT DESCRIPTION FR</label>
+                            <div class="form-input">
+                                <textarea class="form-control" id="product_name_fr" name="product_name_fr"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Textarea -->
+                        <div class="form-group">
+                            <label class="form-label" for="product_feature">PRODUCT Features</label>
+                            <div class="form-input">
+                                <textarea class="form-control" id="product_feature" name="product_feature"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+{% endblock content %}

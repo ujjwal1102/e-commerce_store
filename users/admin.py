@@ -1,18 +1,49 @@
+from .models import Customer, User
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.contrib import admin
-from .models import Product,Category,Customer,ProductImages,Wishlist,ChildCategory,GrantChildCategory
-# Register your models here.
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+from django.utils.translation import gettext_lazy as _
 
-class ProductImagesAdmin(admin.ModelAdmin):
-    list_display = ['product_image_id','product_images']
-
-class ProductAdmin(admin.ModelAdmin):
-    list_display = ['product_id','name','title','category','product_images','cost','add_on']
-
-admin.site.register(Product,ProductAdmin)
 admin.site.register(Customer)
-admin.site.register(Category)
-admin.site.register(ProductImages,ProductImagesAdmin)
-admin.site.register(Wishlist)
-admin.site.register(ChildCategory)
-admin.site.register(GrantChildCategory)
 
+
+User = get_user_model()
+
+
+class CustomUserChangeForm(UserChangeForm):
+    class Meta:
+        model = User
+        fields = '__all__'
+
+
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = '__all__'
+
+
+class CustomUserAdmin(BaseUserAdmin):
+    form = CustomUserChangeForm
+    add_form = CustomUserCreationForm
+
+    list_display = ['email', 'id', 'is_admin', 'is_staff']
+    list_filter = ['is_active']
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        (_('Permissions'), {'fields': (
+            'is_active', 'is_staff', 'is_admin', 'groups', 'user_permissions')}),
+        (_('Important dates'), {'fields': ('last_login',)}),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'password1', 'password2')}
+         ),
+    )
+    search_fields = ['email']
+    ordering = ['email']
+
+
+admin.site.register(User, CustomUserAdmin)

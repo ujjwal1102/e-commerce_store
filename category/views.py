@@ -1,30 +1,28 @@
-# from typing import Any
-from typing import Any
-from django.db.models.query import QuerySet
-from django.forms.models import BaseModelForm
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
-from .models import Category
-from .forms import CategoryForm
-from django.views.generic.edit import FormView,CreateView
-from django.urls import reverse_lazy
-from django.views.generic import ListView,DetailView,DeleteView
-# Create your views here.
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status, permissions
+from category.serializers import CategorySerializer
+from category.models import Category
+from django.db.models import Q, Subquery
 
-class CreateCategoryView(CreateView):
-    form_class = CategoryForm
-    success_url = reverse_lazy('index')
-    template_name = 'category/add_new_category.html'
-    def form_valid(self, form: BaseModelForm) -> HttpResponse:
-        form.save()
-        valid = super().form_valid(form)
-        return valid
 
-class ListCategoryView(ListView):
-    model = Category
-    template_name = 'category/category_list.html'
-    def get_queryset(self) -> QuerySet[Any]:
-        qs = super().get_queryset()
-        qs = qs.order_by('category_name')
-        return qs
-    
+class CategoryView(APIView):
+    def get(self, *args, **kwargs):
+        
+        categories = Category.objects.filter(Q(parent_id__isnull=True) | Q(
+            parent_id__in=Category.objects.filter(parent_id__isnull=True).values_list("id", flat=True))).all()
+        print(categories)
+        serializer = CategorySerializer(categories, many=True)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, format=None):
+        data = request.data
+        serializer = CategorySerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+
+        else:
+
+            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

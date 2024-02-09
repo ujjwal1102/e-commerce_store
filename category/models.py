@@ -10,8 +10,8 @@ class Category(models.Model):
     created_at = models.DateTimeField('created at', default=timezone.now,null=True)
     status = models.PositiveSmallIntegerField(default=1)
     
-    # def __str__(self) -> str:
-    #     super().__str__()
-    #     return self.category_name
+    def __str__(self) -> str:
+        super().__str__()
+        return self.category_name
     
     

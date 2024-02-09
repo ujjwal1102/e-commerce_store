@@ -1,0 +1,81 @@
+<style>
+    #seller-header .nav-link,
+    #seller-header .nav-link:hover,
+    #seller-header .nav-link::after,
+    #seller-header .nav-link::before,
+    #seller-header .nav-link:focus,
+    #seller-header .nav-link:target {
+        color: black;
+    }
+
+    #seller-header .nav-link:target {
+        background-color: aquamarine;
+    }
+</style>
+<section id="seller-header">
+    <nav class="navbar navbar-expand-lg bg-transparent">
+        <div class="container-fluid">
+            <ul class="nav nav-tabs container-fluid d-flex">
+                
+                    <li class="nav-item dropdown">
+                        <!-- <a class="nav-link active" aria-current="page" href="#"></a> -->
+                        <a class="nav-link dropdown-toggle " data-bs-toggle="dropdown" role="button">Catalog</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'add_my_prod' %}">Add Product</a></li>
+                            <li><a class="dropdown-item" href="#">Complete your Drafts</a></li>
+                            <li><a class="dropdown-item" href="#">Upload Images or Videos</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#">------</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="dropdown-toggle nav-link" data-bs-toggle="dropdown" href="#" role="button"
+                            aria-expanded="false">Inventory</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Manage Inventory</a></li>
+                            <li><a class="dropdown-item" href="#">Manage Product Documents</a></li>
+                            <li><a class="dropdown-item" href="#">Add a product</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#">------</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <!-- <a class="nav-link" href="#">Pricing</a> -->
+                        <a class="dropdown-toggle nav-link " data-bs-toggle="dropdown" href="#" role="button"
+                            aria-expanded="false">Orders</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Manage Orders</a></li>
+                            <li><a class="dropdown-item" href="#">Orders Report</a></li>
+                            <li><a class="dropdown-item" href="#">Manage Returns</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#">------</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <!-- <a class="nav-link" href="#">Order</a> -->
+                        <a class="dropdown-toggle nav-link " data-bs-toggle="dropdown" href="#" role="button"
+                            aria-expanded="false">Pricing</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Pricing Health</a></li>
+                            <li><a class="dropdown-item" href="#">Manage Pricing</a></li>
+                            <li><a class="dropdown-item" href="#">Discounts</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#">------</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link  disabled" aria-disabled="true"> Setting </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </nav>
+</section>

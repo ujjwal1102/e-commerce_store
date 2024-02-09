@@ -1,0 +1,18 @@
+{% extends 'seller/homepage.html' %}
+
+{% block content %}
+<style>
+    .nav-link.active {
+        color: rgb(29, 18, 5) !important;
+        background-color: rgb(186, 240, 255) !important;
+
+    }
+</style>
+<div class="container">
+    <div class="row d-flex justify-content-center">
+        <div class="col-10 col-md-8 col-sm-10 col-lg-6 col-xl-6">
+            {{ form1.as_p }} <hr> {{form2.as_p}} <hr> {{form3.as_p}}
+        </div>
+    </div>
+</div>
+{% endblock %}

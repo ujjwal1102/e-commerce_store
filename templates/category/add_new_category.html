@@ -3,44 +3,205 @@
 {% block content %}
 
 
-{{categories_dict}}
-<p>{{categories_json}}</p>
+<!-- {{da_json|safe}} -->
+<!-- <p>{{categories_json}}</p> -->
 
 
 <div class="container py-5">
 
-    <label for="form-label my-1">Select Category</label>
-    {% if categories %}
+    <label for="d-flex justify-content-center">
+        <h4 class="form-label my-1">Categories</h4>
+    </label>
 
 
+    <style>
+        .tree {
+            padding-left: 20px;
+        }
 
-    {% for category in categories %}
-    <div class="card border-0 shadow-sm rounded-0 my-2">
-        <div class="card-body">
-            <div class="d-flex justify-content-between my-auto">
-                <div class="d-flex">
-                    <div class="ms-2 mx-3">
-                        <input type="radio" name="catrgory-radio" id="{{category.id}}"
-                            class="form-check-input shadow-sm">
-                    </div>
-                    <div class="mx-1">
-                        <p class="mb-1">{{category.category_name}}</p>
-                    </div>
-                </div>
-                <div class="">
-                    <i class="fa-solid fa-arrow-right"></i>
-                </div>
+        li {
+            list-style: none;
+        }
 
-            </div>
+        .tree-item {
+            cursor: pointer;
+        }
+
+        .add-button {
+            display: none;
+        }
+        .edit-button {
+            display: none;
+        }
+    </style>
+    <div class="form-view">
+
+        <div id="tree-container" class="py-5">
+
 
         </div>
-    </div>
-    {% endfor %}
 
-    </select>
-    {% endif %}
-    </select>
+
+    </div>
+
+    <script>
+        const data = {{ da_json | safe }};
+
+        const treeContainer = document.getElementById('tree-container');
+        let activeInput = null;
+
+        if (treeContainer) {
+            createTree(data, treeContainer);
+        } else {
+            console.error("Tree container not found");
+        }
+
+        function createTree(data, parentElement) {
+            const ul = document.createElement('ul');
+            ul.classList.add('d-none'); // Initially hide the root ul
+
+            for (const item of data) {
+                const li = document.createElement('li');
+                li.classList.add('tree-item');
+
+                let html = `<div class="card border-0 shadow-sm rounded-0 my-2">
+                    <div class="d-flex">
+                       
+                        <div class="card-body category-card" id="card-${item.id}">
+                            <div class="d-flex my-auto justify-content-between">
+                                <div class="d-flex">
+                                    <div class="mx-1">
+                                        <p class="mb-1">${item.category_name}</p>
+                                    </div>
+                                </div>
+                                <div class="d-flex">
+                                    <small><button class="add-button btn btn-sm btn-secondary mx-2 py-0" data-id="${item.id}">Add Child</button></small>
+                                    <small><button class="edit-button btn btn-sm btn-secondary mx-2 me-3 py-0" data-id="${item.id}">Edit</button></small>
+                                    <div class="arrow-icon">${Object.keys(item.children).length > 0 ? '<i class="fas fa-arrow-right"></i>' : ''}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+
+                li.innerHTML = html;
+
+                if (Object.keys(item.children).length > 0) {
+                    // If item has children, create a sub-tree for them
+                    const subTree = createTree(Object.values(item.children), li);
+                    li.appendChild(subTree);
+                }
+
+                ul.appendChild(li);
+
+                // Add click event to show/hide children
+                li.querySelector('.category-card').addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent parent click event
+                    const subTree = li.querySelector('ul');
+                    if (subTree) {
+                        subTree.classList.toggle('d-none');
+                        const arrowIcon = li.querySelector('.arrow-icon i');
+                        if (arrowIcon) {
+                            arrowIcon.className = subTree.classList.contains('d-none') ? 'fas fa-arrow-right' : 'fas fa-arrow-down';
+                        }
+                    }
+                });
+
+                const addButton = li.querySelector('.add-button');
+                const editButton = li.querySelector('.edit-button');
+                const cardBody = li.querySelector('.category-card');
+
+                // Show the button on hover
+                cardBody.addEventListener('mouseenter', () => {
+                    addButton.style.display = 'inline-block';
+                    editButton.style.display = 'inline-block';
+                });
+
+                cardBody.addEventListener('mouseleave', () => {
+                    addButton.style.display = 'none';
+                    editButton.style.display = 'none';
+                });
+
+                // Add click event to show input field when the button is clicked
+                addButton.addEventListener('click', (e) => {
+                    if (activeInput) {
+                        // If there's an active input, remove it
+                        activeInput.remove();
+                    }
+
+                    // Create a form element
+                    const formElement = document.createElement('form');
+                    formElement.action = "{% url 'my_categories' %}"; // Replace with the actual URL
+                    formElement.method = 'post';
+                    formElement.className = 'd-flex mt-1 form-element';
+                    formElement.innerHTML = '{% csrf_token %}'; // Add the CSRF token
+
+                    const parentInputField = document.createElement('input');
+                    parentInputField.type = 'hidden';
+                    parentInputField.name = 'parent_id';
+                    parentInputField.value = item.id;
+
+                    const submitButton = document.createElement('button');
+                    submitButton.type = 'submit';
+                    submitButton.className = 'btn btn-success mx-2 ';
+                    submitButton.innerText = 'Submit';
+
+                    // Create an input field
+                    const inputField = document.createElement('input');
+                    inputField.type = 'text';
+                    inputField.name = 'category_name';
+                    inputField.className = 'form-control category-name-input';
+
+                    // Append the input field and the form
+                    formElement.appendChild(parentInputField);
+                    formElement.appendChild(inputField);
+                    formElement.appendChild(submitButton);
+                    cardBody.appendChild(formElement);
+
+                    activeInput = formElement;
+
+                    // Add an event listener for the input field
+                    inputField.addEventListener('input', () => {
+                        // Check if the input field is empty
+                        if (inputField.value.trim() === '') {
+                            submitButton.disabled = true; // Disable the button
+                        } else {
+                            submitButton.disabled = false; // Enable the button
+                        }
+                    });
+                }
+            )}
+
+            parentElement.appendChild(ul);
+            return ul;
+        }
+
+        // Show the root ul when the page is loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            const rootUL = treeContainer.querySelector('ul');
+            if (rootUL) {
+                rootUL.classList.remove('d-none');
+            }
+        });
+
+        // Add a global click event listener to close input fields when clicking outside
+        document.addEventListener('click', (e) => {
+            const formElements = document.querySelectorAll('.form-element');
+
+            for (const formElement of formElements) {
+                if (e.target !== formElement && !formElement.contains(e.target)) {
+                    formElement.remove();
+                }
+            }
+        });
+    </script>
+
+
+
+
+
 </div>
+
 
 
 

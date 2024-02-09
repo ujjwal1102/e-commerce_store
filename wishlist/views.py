@@ -1,41 +1,66 @@
-from typing import Any, Dict
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
-from .models import ProductWishlist
-# Create your views here.
-from django.views.generic.list import ListView
-from django.views import View
-from django.http import JsonResponse,HttpResponse
-# from django.views.generic.edit import CreateView,UpdateView,DeleteView
-# from django.shortcuts import render, redirect
-# from django.views.decorators.csrf import csrf_exempt
-import json
 
-class WishlistView(ListView):
-    model = ProductWishlist
-    template_name = 'wishlist/wishlist.html'
-        
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        print('context :',context)
-        return context
+from rest_framework.views import APIView
+from wishlist.models import ProductWishlist
+from wishlist.serializers import WishlistSerializer
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
+from users.models import User
+from product.models import Product
 
-class AddToWishlist(View):
+class WishlistAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     
-    def post(self,*args, **kwargs):
-        prod_id = self.request.POST.get('product_id')
-        user = self.request.user
-        print('prod_id :-',prod_id,'-','user-:-',user,'-')
-        wishlist, created = ProductWishlist.objects.get_or_create(user=user, product_id=prod_id)
-        print(' wishlist : ', wishlist,'created : ',created)
-        if created:
-            status = 'bi-heart-fill'
-            prod_id = prod_id
-            # self.request.session['wishlist'] = ProductWishlist.objects.filter(user=user).values_list('product',flat=True)
+    def get(self,request):
+        # user_id = request.user.id
+        print(type(request.data))
+        print(request.user.id)
+        user = get_object_or_404(User,id=request.user.id)
+        wishlist = ProductWishlist.objects.filter(user=user)
+        serializer = WishlistSerializer(wishlist,many=True)
+        print("data : ",serializer.data)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self,request,format=None):
+        data = request.data
+        
+        print("data : ",data,request.user)
+        print(request.user.id)
+        user = get_object_or_404(User,id=request.user.id)
+        product = get_object_or_404(Product,id=data['product'])
+        serializer = WishlistSerializer(data={'user':user.id,'product':product.id})
+        # print(serializer)
+        if serializer.is_valid():
+            # print(serializer)
+            wishlist = serializer.save()
+            print(wishlist)
+            data = WishlistSerializer(wishlist).data
+            return Response(data=data, status=status.HTTP_201_CREATED)
         else:
-            wishlist.delete()
-            status = 'bi-heart'
-            prod_id=prod_id
-            print('prod_id : ',prod_id)
-        return JsonResponse({'status':status,'prod_id': prod_id})
+            print(serializer.errors)
+            return Response(data={'errors':serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        
+    def put(self, request, pk):
+        try:
+            instance = ProductWishlist.objects.get(pk=pk)
+        except ProductWishlist.DoesNotExist:
+            return Response({"error": "Object not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = WishlistSerializer(instance, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    def delete(self, request):
+        print(request.user.id,request.data)
+        try:
+            instance = ProductWishlist.objects.get(user=request.user,product__id=request.data.get("id"))
+        except ProductWishlist.DoesNotExist:
+            return Response({"error": "Object not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        print(instance)
+        instance.delete()
+        return Response({"message": "Object deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
     

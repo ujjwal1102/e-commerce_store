@@ -1,7 +1,9 @@
 from django.db import models
 from product.models import Product
-from django.contrib.auth.models import User  
-# Create your models here.
+# from django.contrib.auth.models import User  
+from users.models import User
+
+
 
 class ProductWishlist(models.Model):
     id = models.AutoField(auto_created=True,primary_key=True,null=False)
