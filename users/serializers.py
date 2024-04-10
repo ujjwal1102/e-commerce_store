@@ -1,4 +1,4 @@
-from users.models import User,Customer
+from users.models import User, Customer
 from rest_framework import serializers
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model, authenticate
@@ -18,15 +18,32 @@ class UserSerializer(serializers.ModelSerializer):
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
-    ##
+    
+
+    def validate(self, attrs):
+        if not User.objects.filter(email=attrs['email']).exists():
+            raise ValidationError({'username': 'This email does not exist.'})
+
+        # Check if the password is too short.
+        if len(attrs['password']) < 8:
+            raise ValidationError(
+                {'password': 'Your password must be at least 8 characters long.'})
+
+        return attrs
 
     def check_user(self, clean_data):
         user = authenticate(
             username=clean_data['email'], password=clean_data['password'])
-        if not user:
-            raise ValidationError('user not found')
-        return user
-
+        if user is not None:
+            user_data = User.objects.get(email=clean_data['email'])
+            # print("user_data.is_staff : ",user_data.is_staff_user,"user_data.is_admin : ",user_data.is_admin_user,"user_data.is_active : ",user_data.is_active)
+            user_data = {"is_staff": user_data.is_staff_user,
+                         "is_admin": user_data.is_admin_user, "is_active": user_data.is_active}
+            if not user:
+                raise ValidationError('user not found')
+            return user, user_data
+        else:
+            return (None, "Email or password is Incorrect")
 # UserModel = get_user_model()
 
 # class UserRegisterSerializer(serializers.ModelSerializer):
@@ -44,12 +61,16 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         required=True,
         validators=[UniqueValidator(queryset=User.objects.all(),
-                                    message="Email exists...!")]
+                                    message="Email already exists...!")]
     )
 
     password = serializers.CharField(
-        write_only=True, required=True, validators=[validate_password])
-    confirm_password = serializers.CharField(write_only=True, required=True)
+        write_only=True, required=True, validators=[validate_password],error_messages={
+            'blank': 'Password should not be blank.'
+        })
+    confirm_password = serializers.CharField(write_only=True, required=True,error_messages={
+            'blank': 'Confirm Password should not be blank.'
+        })
 
     class Meta:
         model = User
@@ -69,8 +90,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         user = super().create(validated_data)
         user.set_password(validated_data['password'])
         user.save()
+        
         return user
-
 
 
 class CustomerSerializer(serializers.ModelSerializer):
@@ -78,5 +99,3 @@ class CustomerSerializer(serializers.ModelSerializer):
         model = Customer
         fields = '__all__'
         depth = 2
-        
-    

@@ -70,9 +70,9 @@
 #         return render(self.request,'seller/catalog/add_product.html')
 from typing import Any
 from rest_framework.views import APIView
-from .serializers import ProductSerializer
+from .serializers import ProductSerializer, BrandSerializer
 from rest_framework.response import Response
-from product.models import Product
+from product.models import Product, Brand
 from category.models import Category
 from rest_framework import status
 # from django.shortcuts import get_object_or_404
@@ -138,25 +138,28 @@ def dynamic_attributes_filtering_products(self, products, keysdict):
 class ProductsAPIView(APIView):
 
     def get(self, request, format=None):
-        products = Product.objects.all()[:8:1]
-        wishlist_items = None
-        if request.user.is_authenticated:
-            wishlist_items = ProductWishlist.objects.filter(
-                user=request.user, product__in=products)
-        else:
-            wishlist_items = ProductWishlist.objects.none()
-        print
-        # result_page = paginator.paginate_queryset(
-        #     queryset=products, request=request)
-        serialized_products = ProductSerializer(products, many=True).data
-        wishlist_serializer = WishlistSerializer(
-            wishlist_items, many=True).data
-        wl_item = [ws['product']['id'] for ws in wishlist_serializer]
-        # serialized_data = {"products": serialized_products,
-        #                    "wishlist_items": wishlist_serializer, "wl_item": wl_item, "result_page": result_page}
-        # serialized_data =
-        # prod = ProductSerializer(result_page, many=True).data
-        return Response(data=serialized_products, status=status.HTTP_200_OK)
+        try:
+            products = Product.objects.all()[:8:1]
+            wishlist_items = None
+            if request.user.is_authenticated:
+                wishlist_items = ProductWishlist.objects.filter(
+                    user=request.user, product__in=products)
+            else:
+                wishlist_items = ProductWishlist.objects.none()
+            print("wishlist_items",wishlist_items)
+            serialized_products = ProductSerializer(products, many=True).data
+            wishlist_serializer = WishlistSerializer(
+                wishlist_items, many=True).data
+            wl_item = [ws['product']['id'] for ws in wishlist_serializer]
+            # serialized_data = {"products": serialized_products,
+            #                    "wishlist_items": wishlist_serializer, "wl_item": wl_item, "result_page": result_page}
+            # serialized_data =
+            # prod = ProductSerializer(result_page, many=True).data
+            return Response(data={"data":serialized_products,"wl_item":wl_item}, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e)
+            return Response(data={"exception":str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            
         # print(prod)
         # return paginator.get_paginated_response(prod)
         # return Response("ok")
@@ -228,15 +231,72 @@ class ProductRetrieveAPIView(RetrieveAPIView):
         serializer = self.get_serializer(instance)
         # custom_serializer = {"id":serializer.data["id"],"thumbnail_image": serializer.data["thumbnail_image"],"cost":serializer.data["cost"],"title":serializer.data["title"],"description":serializer.data["description"],"features":serializer.data["features"],"image_url":serializer.data["image_url"],"quantity":serializer.data["quantity"],"discount_price":serializer.data["discount_price"],"created_at":serializer.data["created_at",]}
         serialized_data = serializer.data
-
         return Response(serialized_data)
 
 
-class SellerProductListAPIView(ListAPIView):
+class SellerProductListAPIView(APIView):
 
-    queryset = Product.objects.filter(id__lte=50).all()
-    serializer_class = ProductSerializer
-    # pagination_class = MyCustomPagination
+    def get(self, request, *args, **kwargs):
+        try:
+            paginator = MyCustomPagination()
+            products = Product.objects.all()
+            paginated_products = paginator.paginate_queryset(
+                products, self.request)
+            serializer = ProductSerializer(
+                paginated_products, many=True).data
+            return Response(data={"products": serializer,"total_count":products.count(),
+                                  "page": {"total_page": paginator.page.paginator.num_pages,
+                                           "current_page": paginator.page.number,
+                                           'next_page_number': paginator.page.next_page_number() if paginator.page.has_next() else None,
+                                           'previous_page_number': paginator.page.previous_page_number() if paginator.page.has_previous() else None,
+                                           "next_link": paginator.get_next_link(),
+                                           "previous_link": paginator.get_previous_link()}}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return Response(data={"Exception": str(e)}, status=status.HTTP_200_OK)
+
+# class SellerProductListAPIView(ListAPIView):
+#     queryset = Product.objects.all()
+#     serializer_class = ProductSerializer
+#     pagination_class = MyCustomPagination
+
+    # def list(self, request, *args, **kwargs):
+    #     queryset = self.filter_queryset(self.get_queryset())
+    #     page = self.paginate_queryset(queryset)
+
+    #     if page is not None:
+    #         serializer = self.get_serializer(page, many=True)
+    #         paginator = self.paginator
+    #         response_data = {
+    #             "data": serializer.data,
+    #             "page": {
+    #                 "total_page": paginator.page.paginator.num_pages,
+    #                 "current_page": paginator.page.number,
+    #                 'next_page_number': paginator.page.next_page_number() if paginator.page.has_next() else None,
+    #                 'previous_page_number': paginator.page.previous_page_number() if paginator.page.has_previous() else None,
+    #                 "next_link": paginator.get_next_link(),
+    #                 "previous_link": paginator.get_previous_link()
+    #             }
+    #         }
+    #         return self.get_paginated_response(response_data)
+
+    #     serializer = self.get_serializer(queryset, many=True)
+
+    #     # For non-paginated response, include only "data" and "page"
+    #     response_data = {
+    #         "data": serializer.data,
+    #         "page": {
+    #             "total_page": None,
+    #             "current_page": None,
+    #             'next_page_number': None,
+    #             'previous_page_number': None,
+    #             "next_link": None,
+    #             "previous_link": None
+    #         }
+    #     }
+
+    #     return Response(response_data, status=status.HTTP_200_OK)
 
 
 class SellerProductRetrieveAPIView(RetrieveAPIView):
@@ -257,6 +317,16 @@ class SellerProductUpdateAPIView(UpdateAPIView):
     queryset = Product.objects.all()
     # def get_queryset(self):
     #     return Product.objects.all()
+
+
+class BrandAPIView(APIView):
+    def get(self, request, format=None):
+        try:
+            brands = Brand.objects.all()
+            serialized_brands = BrandSerializer(brands, many=True)
+            return Response(serialized_brands.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
 class AllProducts:

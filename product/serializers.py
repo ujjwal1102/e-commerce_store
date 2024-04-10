@@ -1,21 +1,48 @@
-from .models import Product
+from .models import Product,Brand
+    
 from rest_framework import serializers
 from category.models import Category
+from django.core.validators import MinLengthValidator
 
 class ProductSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(max_length=500, required=True,allow_blank=False,trim_whitespace=True)
-    title = serializers.CharField(max_length=300, required=True,allow_blank=False,trim_whitespace=True)
-    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), required=False)
-    description = serializers.CharField(max_length=20000, required=False)
-    brand = serializers.CharField(max_length=100, required=True)
-    cost = serializers.FloatField(default=None, required=False)
-    discount_price = serializers.FloatField(default=None, required=False)
-    details = serializers.CharField(max_length=2000,required=False)
-    quantity = serializers.IntegerField(required=True)
-    brand = serializers.CharField(max_length=100, required=False)
-    thumbnail_image = serializers.ImageField(required=True)
-    images = serializers.ListField(max_length=10000,child=serializers.DictField(),required=False)
-    
+    name = serializers.CharField(
+        max_length=500, required=True, allow_blank=False, trim_whitespace=True, validators=[
+            MinLengthValidator(
+                limit_value=1, message='It should not be empty.')
+        ],error_messages={
+            'blank': 'Name should not be blank.'
+        })
+    title = serializers.CharField(
+        max_length=300, required=True, allow_blank=False, trim_whitespace=True,error_messages={
+            'blank': 'Title should not be blank.'
+        })
+    category = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(), required=False,error_messages={
+            'incorrect_type': 'Select a category.'
+        })
+    description = serializers.CharField(max_length=20000, required=False,error_messages={
+            'blank': 'Title should not be blank.'
+        })
+    brand = serializers.CharField(max_length=100, required=True,error_messages={
+            'blank': 'Title should not be blank.'
+        })
+    cost = serializers.FloatField(default=None, required=False,error_messages={
+            'blank': 'Title should not be blank.'
+        })
+    discount_price = serializers.FloatField(default=None, required=False,)
+    details = serializers.CharField(max_length=2000, required=False)
+    quantity = serializers.IntegerField(required=True,error_messages={
+            'blank': 'Quantity should not be blank.','invalid': 'Set the quantity',
+        })
+    brand = serializers.CharField(max_length=100, required=False,error_messages={
+            'blank': 'Brand should not be blank.'
+        })
+    thumbnail_image = serializers.ImageField(required=True,error_messages={
+            'blank': 'Thumbnail Image should not be blank.'
+        })
+    images = serializers.ListField(
+        max_length=10000, child=serializers.DictField(), required=False)
+
     # def to_internal_value(self, data):
     #     # Map incoming keys to the expected keys
     #     mapping = {
@@ -30,51 +57,55 @@ class ProductSerializer(serializers.ModelSerializer):
 
     #     # Call the default to_internal_value implementation
     #     return super().to_internal_value(mapped_data)
-    def validate_images(self,value):
-        
-        print("Value ------ ",value)
-        # for img in value:
-        #     print("image value : ",img)
-        #     print(img)
-        
-        
-        
     
+    def validate_images(self, value):
+
+        print("Value ------ ", value)
+        for img in value:
+            print("image value : ", img)
+            print(img)
+
     class Meta:
         model = Product
         fields = '__all__'
-    
+
+    def validate_name(self, name):
+        # print("validate_name(self,name) : ", name)
+        if name is None or '':
+            raise serializers.ValidationError('Name Should not be empty')
+        return name
+
     # def validate(self, data):
+    #     print("validate(self, data): ",data)
     #     errors = {}
 
-    #     # Validate 'name'
-    #     if not data.get('productName'):
-    #         errors['productName'] = 'Name is required.'
+    #     # Custom validation for name
+    #     name = data.get('name', '')
+    #     if not name.strip():
+    #         errors['name'] = 'Name should not be blank.'
 
-    #     # Validate 'title'
-    #     if not data.get('title'):
-    #         errors['title'] = 'Title is required.'
+    #     # Custom validation for quantity
+    #     quantity = data.get('quantity')
+    #     if quantity is not None and quantity <= 0:
+    #         errors['quantity'] = 'Quantity must be a positive integer.'
 
-    #     # Validate 'category'
-    #     if not data.get('category'):
-    #         errors['category'] = 'Category is required.'
-
-    #     # Validate 'details'
-    #     if not data.get('details'):
-    #         errors['details'] = 'Details is required.'
-
-    #     # Validate 'brand'
-    #     if not data.get('brand'):
-    #         errors['brand'] = 'Brand is required.'
-
+    #     # Custom validation for thumbnail_image
+    #     thumbnail_image = data.get('thumbnail_image')
+    #     if thumbnail_image and not isinstance(thumbnail_image, (bytes, bytearray)):
+    #         errors['thumbnail_image'] = 'Invalid file format. Must be a valid image file.'
 
     #     if errors:
     #         raise serializers.ValidationError(errors)
 
-        # return data
+    #     return data
     
-    
-    def create(self, validated_data):
+    def create(self, validated):
         # Implement your custom create logic here
         # This method is called when creating a new instance
-        return Product.objects.create(**validated_data)
+        return Product.objects.create(**validated)
+
+
+class BrandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Brand
+        fields = '__all__'

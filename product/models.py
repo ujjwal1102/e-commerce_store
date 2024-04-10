@@ -41,7 +41,7 @@ class Product(models.Model):
             
         
         return
-    # def get_the_fields
+    
 
 class Variant(models.Model):
     id = models.AutoField(auto_created=True,primary_key=True,null=False)

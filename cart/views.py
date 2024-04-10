@@ -26,14 +26,14 @@ from django.shortcuts import get_object_or_404
 def calc_cart_items(cart_items):
     total_cost = 0
     cart_products = []
-    print(cart_items['cart_items'])
+    # print(cart_items['cart_items'])
     try:
         for item in cart_items['cart_items']:
             product = Product.objects.get(id=item['id'])
             cart_products.append(ProductSerializer(product).data)
             total_cost = round(total_cost +(product.cost * int(item['quantity'])),2)
-            print(item['id'],'product.cost : ',product.cost,"total_cost : ",total_cost,"cart_products : ",cart_products)
-        print('total_cost : ',total_cost)  
+            # print(item['id'],'product.cost : ',product.cost,"total_cost : ",total_cost,"cart_products : ",cart_products)
+        # print('total_cost : ',total_cost)  
     except:
         pass
     return (total_cost,cart_items,cart_products)

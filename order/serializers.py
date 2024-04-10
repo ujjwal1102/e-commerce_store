@@ -1,6 +1,7 @@
 import datetime
 
 from rest_framework import serializers
+from .models import Order
 
 
 def check_expiry_month(value):
@@ -24,6 +25,7 @@ def check_payment_method(value):
     if payment_method not in ["card"]:
         raise serializers.ValidationError("Invalid payment_method.")
 
+
 class CardInformationSerializer(serializers.Serializer):
     card_number = serializers.CharField(max_length=150, required=True)
     expiry_month = serializers.CharField(
@@ -41,3 +43,18 @@ class CardInformationSerializer(serializers.Serializer):
         required=True,
         validators=[check_cvc],
     )
+
+
+class PaymentSerializer(serializers.Serializer):
+    total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    payment_method_id = serializers.CharField()
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Order
+        fields = '__all__'
+        depth = 3
+        
+

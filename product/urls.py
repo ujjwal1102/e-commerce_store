@@ -13,4 +13,5 @@ urlpatterns = [
     path('shop', view=views.ShopView.as_view()),
     path('homeshop',views.HomeShopAPIView.as_view()),
     path('shop/<int:id>',views.ShopCategoryAPIView.as_view()),
+    path('brands',view=views.BrandAPIView.as_view()),
 ]
