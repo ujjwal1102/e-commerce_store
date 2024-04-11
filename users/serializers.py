@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
-
+from django.db import transaction
 User = get_user_model()
 
 
@@ -18,7 +18,6 @@ class UserSerializer(serializers.ModelSerializer):
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
-    
 
     def validate(self, attrs):
         if not User.objects.filter(email=attrs['email']).exists():
@@ -38,12 +37,17 @@ class UserLoginSerializer(serializers.Serializer):
             user_data = User.objects.get(email=clean_data['email'])
             # print("user_data.is_staff : ",user_data.is_staff_user,"user_data.is_admin : ",user_data.is_admin_user,"user_data.is_active : ",user_data.is_active)
             user_data = {"is_staff": user_data.is_staff_user,
-                         "is_admin": user_data.is_admin_user, "is_active": user_data.is_active}
+                         "is_admin": user_data.is_admin_user,
+                         "is_active": user_data.is_active,
+                         "is_seller": user.is_seller_user,
+                         "is_customer": user.is_customer_user}
             if not user:
                 raise ValidationError('user not found')
             return user, user_data
         else:
             return (None, "Email or password is Incorrect")
+
+
 # UserModel = get_user_model()
 
 # class UserRegisterSerializer(serializers.ModelSerializer):
@@ -65,12 +69,12 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     )
 
     password = serializers.CharField(
-        write_only=True, required=True, validators=[validate_password],error_messages={
+        write_only=True, required=True, validators=[validate_password], error_messages={
             'blank': 'Password should not be blank.'
         })
-    confirm_password = serializers.CharField(write_only=True, required=True,error_messages={
-            'blank': 'Confirm Password should not be blank.'
-        })
+    confirm_password = serializers.CharField(write_only=True, required=True, error_messages={
+        'blank': 'Confirm Password should not be blank.'
+    })
 
     class Meta:
         model = User
@@ -85,12 +89,21 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        # Remove confirm_password from validated_data
         validated_data.pop('confirm_password', None)
-        user = super().create(validated_data)
+        # Get user type from context
+        user_type = self.context.get('user_type', None)
+        with transaction.atomic():
+            if user_type == 'customer':
+                user = User.objects.create_customer(**validated_data)
+            elif user_type == 'seller':
+                user = User.objects.create_seller(**validated_data)
+            else:
+                user = super().create(validated_data)
+
+        # user = super().create(validated_data)
         user.set_password(validated_data['password'])
         user.save()
-        
+
         return user
 
 

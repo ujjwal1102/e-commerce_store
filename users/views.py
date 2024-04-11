@@ -18,7 +18,6 @@ from users.models import Customer
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    
 
     @classmethod
     def get_token(cls, user):
@@ -29,6 +28,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['is_superuser'] = user.is_admin_user
         token['is_staff'] = user.is_staff_user
         token['is_active'] = user.is_active
+        token["is_seller"] = user.is_seller_user
+        token["is_customer"] = user.is_customer_user
+
         return token
 
 
@@ -48,26 +50,30 @@ class RegisterAPIView(APIView):
 
     def post(self, request, format=None):
         data = request.data
-        print("outer : ",request.user)
+        print("outer : ", request.user)
         print(data)
-        serializer = UserRegisterSerializer(data=data)
+        serializer = UserRegisterSerializer(
+            data=data, context={"user_type": data.get("user_type")})
         if serializer.is_valid(raise_exception=True):
             user = serializer.save()
             user_data = {"is_staff": user.is_staff_user,
-                         "is_admin": user.is_admin_user, "is_active": user.is_active}
+                         "is_admin": user.is_admin_user,
+                         "is_active": user.is_active,
+                         "is_seller": user.is_seller_user,
+                         "is_customer": user.is_customer_user}
             print(user)
             login(request, user)
             token_serializer = CustomTokenObtainPairSerializer()
             token = token_serializer.get_token(user)
             response_data = {
-                    'user': serializer.data,
-                    'token': {
-                        'refresh': str(token),
-                        'access': str(token),
-                    },
-                    # 'session_id': session_id,
-                    'user_data': user_data,
-                }
+                'user': serializer.data,
+                'token': {
+                    'refresh': str(token),
+                    'access': str(token),
+                },
+                # 'session_id': session_id,
+                'user_data': user_data,
+            }
             print('user created')
             return Response(data={'data': response_data, }, status=status.HTTP_200_OK)
         else:
@@ -76,6 +82,7 @@ class RegisterAPIView(APIView):
             return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         # else:
         #     return Response(serializer.errors, status=status.HTTP_200_OK)
+        # return Response({'error': ""}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginAPIView(APIView):
@@ -153,18 +160,19 @@ class CustomerView(APIView):
             print(customer)
         return Response(data={"customer": customer}, status=status.HTTP_200_OK)
 
-    def post(self, request, format=None): 
-    
+    def post(self, request, format=None):
+
         customer = get_object_or_404(Customer, user=self.request.user.id)
         if customer:
-            serializer = CustomerSerializer(customer, data=request.data, partial=True)
+            serializer = CustomerSerializer(
+                customer, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
-                return Response(data={"customer": serializer.data,"message": "Profile updated successfully"}, status=status.HTTP_200_OK)
+                return Response(data={"customer": serializer.data, "message": "Profile updated successfully"}, status=status.HTTP_200_OK)
             else:
                 return Response(data={"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(data={"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-        
+
     def put(self, request, format=None): pass
     def delete(self, request, format=None): pass

@@ -2,7 +2,7 @@ from django.db import models
 from category.models import Category
 from django.utils import timezone
 from django.urls import reverse
-
+from users.models import User
 
 class Brand(models.Model):
     id = models.AutoField(auto_created=True,primary_key=True,null=False)
@@ -26,6 +26,7 @@ class Product(models.Model):
     created_at = models.DateTimeField('created_at', default=timezone.now,)
     image_url = models.URLField(max_length = 200,null=True) 
     discount_price = models.FloatField(default=None, null=True)
+    seller = models.ForeignKey(User,on_delete=models.CASCADE,null=True, blank=True)
     
     
     def get_absolute_url(self):

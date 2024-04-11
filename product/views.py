@@ -75,12 +75,14 @@ from rest_framework.response import Response
 from product.models import Product, Brand
 from category.models import Category
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated, AllowAny
 # from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListAPIView, UpdateAPIView, RetrieveAPIView
 from wishlist.models import ProductWishlist
 from wishlist.serializers import WishlistSerializer
 from rest_framework.decorators import api_view
 import json
+
 from rest_framework.pagination import PageNumberPagination
 from django.conf import settings
 
@@ -136,7 +138,7 @@ def dynamic_attributes_filtering_products(self, products, keysdict):
 
 
 class ProductsAPIView(APIView):
-
+    
     def get(self, request, format=None):
         try:
             products = Product.objects.all()[:8:1]
@@ -146,7 +148,7 @@ class ProductsAPIView(APIView):
                     user=request.user, product__in=products)
             else:
                 wishlist_items = ProductWishlist.objects.none()
-            print("wishlist_items",wishlist_items)
+            print("wishlist_items", wishlist_items)
             serialized_products = ProductSerializer(products, many=True).data
             wishlist_serializer = WishlistSerializer(
                 wishlist_items, many=True).data
@@ -155,11 +157,11 @@ class ProductsAPIView(APIView):
             #                    "wishlist_items": wishlist_serializer, "wl_item": wl_item, "result_page": result_page}
             # serialized_data =
             # prod = ProductSerializer(result_page, many=True).data
-            return Response(data={"data":serialized_products,"wl_item":wl_item}, status=status.HTTP_200_OK)
+            return Response(data={"data": serialized_products, "wl_item": wl_item}, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response(data={"exception":str(e)}, status=status.HTTP_400_BAD_REQUEST)
-            
+            return Response(data={"exception": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
         # print(prod)
         # return paginator.get_paginated_response(prod)
         # return Response("ok")
@@ -201,7 +203,10 @@ class ProductsAPIView(APIView):
 
     #     return Response(data=serialized_products, status=status.HTTP_200_OK)
     #     # return self.get_paginated_response()
+
     def post(self, request, format=None):
+        
+            
         print("request.data", request.data, "request.data.json.loads",
               json.loads(request.data['features']))
         serializer = ProductSerializer(data=request.data)
@@ -244,7 +249,7 @@ class SellerProductListAPIView(APIView):
                 products, self.request)
             serializer = ProductSerializer(
                 paginated_products, many=True).data
-            return Response(data={"products": serializer,"total_count":products.count(),
+            return Response(data={"products": serializer, "total_count": products.count(),
                                   "page": {"total_page": paginator.page.paginator.num_pages,
                                            "current_page": paginator.page.number,
                                            'next_page_number': paginator.page.next_page_number() if paginator.page.has_next() else None,
@@ -313,6 +318,7 @@ class SellerProductRetrieveAPIView(RetrieveAPIView):
 
 
 class SellerProductUpdateAPIView(UpdateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
     # def get_queryset(self):
@@ -637,3 +643,15 @@ class ShopView(APIView):
 
 #         except Exception as e:
 #             return Response(data={'Exception': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class SellerHomePageView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, *args, **kwargs):
+        user = self.request.user.id
+        products = Product.objects.filter()
+        return Response(data={"products": {"total": 0, "active": 0, "sold": 0}}, status=status.HTTP_200_OK)
+
+    # def post(self, *args, **kwargs):
+    #     return

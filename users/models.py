@@ -23,6 +23,8 @@ class UserManager(BaseUserManager):
     def create_staffuser(self, email, password=None, **extra_fields):
         user = self.create_user(email, password=password, **extra_fields)
         user.is_staff = True
+        user.is_seller = True
+        user.is_customer = True
         user.save(using=self._db)
         return user
 
@@ -30,16 +32,33 @@ class UserManager(BaseUserManager):
         user = self.create_user(email, password=password, **extra_fields)
         user.is_staff = True
         user.is_admin = True
+        user.is_seller = True
+        user.is_customer = True
         user.save(using=self._db)
         return user
-
+    
+    def create_seller(self, email, password=None, **extra_fields):
+        user = self.create_user(email, password=password, **extra_fields)
+        user.is_active = True
+        user.is_seller = True
+        user.save(using=self._db)
+        return user
+    
+    def create_customer(self, email, password=None, **extra_fields):
+        user = self.create_user(email, password=password, **extra_fields)
+        user.is_active = True
+        user.is_customer = True
+        user.save(using=self._db)
+        return user
+    
 class User(AbstractBaseUser, PermissionsMixin):
     
     email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
-
+    is_seller = models.BooleanField(default=False)
+    is_customer = models.BooleanField(default=False)
     # Additional fields
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
@@ -79,6 +98,15 @@ class User(AbstractBaseUser, PermissionsMixin):
         "Is the user an admin member?"
         return self.is_admin
 
+    @property
+    def is_customer_user(self):
+        "Is the user an admin member?"
+        return self.is_customer
+    
+    @property
+    def is_seller_user(self):
+        "Is the user an admin member?"
+        return self.is_seller
 
 
 class Customer(models.Model):

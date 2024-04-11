@@ -28,12 +28,12 @@ class CustomUserAdmin(BaseUserAdmin):
     form = CustomUserChangeForm
     add_form = CustomUserCreationForm
 
-    list_display = ['email', 'id', 'is_admin', 'is_staff']
-    list_filter = ['is_active']
+    list_display = ['email', 'id', 'is_admin', 'is_staff','is_seller','is_customer']
+    list_filter = ['is_active','is_admin', 'is_staff','is_seller','is_customer']
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         (_('Permissions'), {'fields': (
-            'is_active', 'is_staff', 'is_admin', 'groups', 'user_permissions')}),
+            'is_active', 'is_staff', 'is_admin','is_seller','is_customer', 'groups', 'user_permissions')}),
         (_('Important dates'), {'fields': ('last_login',)}),
     )
     add_fieldsets = (
