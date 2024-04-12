@@ -111,16 +111,16 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Customer(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=30,null=True) 
-    last_name = models.CharField(max_length=30,null=True)
-    phone = models.BigIntegerField()
+    first_name = models.CharField(max_length=30,null=True,blank=True) 
+    last_name = models.CharField(max_length=30,null=True,blank=True)
+    phone = models.BigIntegerField(null=True,blank=True)
     updated_on =  models.DateTimeField('updated on', default=timezone.now)
-    address = models.CharField(max_length=800)
+    address = models.CharField(max_length=800,blank=True,null=True)
     #################################################
-    country = models.CharField(max_length=200)
-    state = models.CharField(max_length=30)
-    city = models.CharField(max_length=30,null=True)
-    pin_code = models.CharField(max_length=6,null=True)
+    country = models.CharField(max_length=200,blank=True,null=True)
+    state = models.CharField(max_length=30,blank=True,null=True)
+    city = models.CharField(max_length=30,null=True,blank=True)
+    pin_code = models.CharField(max_length=6,null=True,blank=True)
     
     
     

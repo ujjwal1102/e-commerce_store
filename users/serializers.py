@@ -108,7 +108,38 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 
 class CustomerSerializer(serializers.ModelSerializer):
+    # class Meta:
+    #     model = Customer
+    #     fields = '__all__'
+    #     depth = 2
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    first_name = serializers.CharField(max_length=30, allow_null=True, required=False)
+    last_name = serializers.CharField(max_length=30, allow_null=True, required=False)
+    phone = serializers.CharField(required=False)
+    address = serializers.CharField(max_length=800, allow_blank=True, required=False)
+    country = serializers.CharField(max_length=200, allow_blank=True, required=False)
+    state = serializers.CharField(max_length=30, allow_blank=True, required=False)
+    city = serializers.CharField(max_length=30, allow_blank=True, allow_null=True, required=False)
+    pin_code = serializers.CharField(max_length=6, allow_blank=True, allow_null=True, required=False)
+
     class Meta:
         model = Customer
         fields = '__all__'
         depth = 2
+
+    def validate_phone(self, value):
+        """
+        Validate that the phone number is a valid integer.
+        """
+        if value and not value.isdigit():
+            raise serializers.ValidationError("Phone number must contain only digits.")
+        
+        return value
+
+    def validate(self, data):
+        """
+        Validate the serializer data.
+        """
+        return data
+    
+    
