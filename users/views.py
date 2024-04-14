@@ -11,10 +11,6 @@ from django.contrib.auth import authenticate, login, logout
 from .serializers import UserSerializer, UserLoginSerializer, CustomerSerializer
 from users.models import Customer, User
 
-# # Create your views here.
-# class IndexView(viewsets):
-#     def retrive(self,*args,**kwargs):
-#         pass
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -75,7 +71,6 @@ class RegisterAPIView(APIView):
                     "refresh": str(token),
                     "access": str(token),
                 },
-                # 'session_id': session_id,
                 "user_data": user_data,
             }
             print("user created")
@@ -86,19 +81,12 @@ class RegisterAPIView(APIView):
                 status=status.HTTP_200_OK,
             )
         else:
-            # print(serializer.errors)
-            # print(serializer.error_messages)
             return Response(
                 {"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST
             )
-        # else:
-        #     return Response(serializer.errors, status=status.HTTP_200_OK)
-        # return Response({'error': ""}, status=status.HTTP_400_BAD_REQUEST)
-
 
 class LoginAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
-    # authentication_classes = (SessionAuthentication,)
 
     def post(self, request):
         data = request.data
@@ -110,7 +98,6 @@ class LoginAPIView(APIView):
                 login(request, user)
                 session_id = request.session.session_key
 
-                # token = get_tokens_for_user(user)
                 token_serializer = CustomTokenObtainPairSerializer()
                 token = token_serializer.get_token(user)
 
@@ -134,17 +121,7 @@ class LoginAPIView(APIView):
                 {"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST
             )
 
-    # def post(self, request):
-    #     username = request.data.get('username')
-    #     password = request.data.get('password')
-    #     user = authenticate(request, username=username, password=password)
-
-    #     if user:
-    #         login(request, user)
-    #         return Response(UserSerializer(user).data)
-    #     else:
-    #         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-
+   
 
 class LogoutView(APIView):
     permission_classes = (permissions.AllowAny,)
@@ -157,11 +134,8 @@ class LogoutView(APIView):
 
 class UserView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
-    # authentication_classes = (SessionAuthentication,)
 
     def get(self, request, format=None):
-        # print(request.user)
-        # print(permissions.IsAuthenticated)
         serializer = UserSerializer(request.user)
         print(serializer)
         return Response({"user": serializer.data}, status=status.HTTP_200_OK)
@@ -215,18 +189,7 @@ class CustomerView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-        # customer = get_object_or_404(Customer, user=self.request.user.id)
-        # if customer:
-        #     serializer = CustomerSerializer(
-        #         customer, data=request.data, partial=True)
-        #     if serializer.is_valid():
-        #         serializer.save()
-        #         return Response(data={"customer": serializer.data, "message": "Profile updated successfully"}, status=status.HTTP_200_OK)
-        #     else:
-        #         return Response(data={"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-        # else:
-        #     return Response(data={"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-
+        
     def put(self, request, format=None):
         pass
 

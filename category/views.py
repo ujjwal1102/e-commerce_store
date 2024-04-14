@@ -25,8 +25,6 @@ class CategoryView(APIView):
 
 class CategoryFormView(APIView):
     def get(self, *args, **kwargs):
-        # categories = Category.objects.filter(Q(
-        #     parent_id__in=Category.objects.filter(parent_id__isnull=True).values_list("id", flat=True)))
         categories = Category.objects.all()
         serializer = CategoryFormSerializer(categories, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)

@@ -48,19 +48,6 @@ class UserLoginSerializer(serializers.Serializer):
             return (None, "Email or password is Incorrect")
 
 
-# UserModel = get_user_model()
-
-# class UserRegisterSerializer(serializers.ModelSerializer):
-# 	class Meta:
-# 		model = UserModel
-# 		fields = '__all__'
-# 	def create(self, clean_data):
-# 		user_obj = UserModel.objects.create_user(email=clean_data['email'], password=clean_data['password'])
-# 		user_obj.username = clean_data['username']
-# 		user_obj.save()
-# 		return user_obj
-
-
 class UserRegisterSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         required=True,
@@ -90,7 +77,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop('confirm_password', None)
-        # Get user type from context
         user_type = self.context.get('user_type', None)
         with transaction.atomic():
             if user_type == 'customer':
@@ -100,7 +86,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             else:
                 user = super().create(validated_data)
 
-        # user = super().create(validated_data)
         user.set_password(validated_data['password'])
         user.save()
 
@@ -108,10 +93,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 
 class CustomerSerializer(serializers.ModelSerializer):
-    # class Meta:
-    #     model = Customer
-    #     fields = '__all__'
-    #     depth = 2
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     first_name = serializers.CharField(max_length=30, allow_null=True, required=False)
     last_name = serializers.CharField(max_length=30, allow_null=True, required=False)
