@@ -6,7 +6,7 @@ from . import views
 urlpatterns = [
     path('products', view=views.ProductsAPIView.as_view()),
     path('seller/products', view=views.SellerProductListAPIView.as_view()),
-    path('seller/products', view=views.SellerProductUpdateAPIView.as_view()),
+    # path('seller/products', view=views.SellerProductUpdateAPIView.as_view()),
     path('seller/product/<int:pk>',
          view=views.SellerProductRetrieveAPIView.as_view()),
     path('product/<int:pk>', views.ProductRetrieveAPIView.as_view()),

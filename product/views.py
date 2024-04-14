@@ -240,11 +240,12 @@ class ProductRetrieveAPIView(RetrieveAPIView):
 
 
 class SellerProductListAPIView(APIView):
-
+    permission_classes = [IsAuthenticated]
     def get(self, request, *args, **kwargs):
         try:
+            user_id = self.request.user.id
             paginator = MyCustomPagination()
-            products = Product.objects.all()
+            products = Product.objects.filter(seller__id=user_id)
             paginated_products = paginator.paginate_queryset(
                 products, self.request)
             serializer = ProductSerializer(
