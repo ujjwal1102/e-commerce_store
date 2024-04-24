@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from .serializers import UserSerializer, UserLoginSerializer, CustomerSerializer
 from users.models import Customer, User
-
+from .validations import send_otp_email, verify_otp
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -42,6 +42,49 @@ def get_tokens_for_user(user):
 # from django.middleware import csrf
 
 
+# class RegisterAPIView(APIView):
+#     permission_classes = (permissions.AllowAny,)
+
+#     def post(self, request, format=None):
+#         data = request.data
+#         print("outer : ", request.user)
+#         print(data)
+#         serializer = UserRegisterSerializer(
+#             data=data, context={"user_type": data.get("user_type")}
+#         )
+#         if serializer.is_valid(raise_exception=True):
+#             user = serializer.save()
+#             user_data = {
+#                 "is_staff": user.is_staff_user,
+#                 "is_admin": user.is_admin_user,
+#                 "is_active": user.is_active,
+#                 "is_seller": user.is_seller_user,
+#                 "is_customer": user.is_customer_user,
+#             }
+#             print(user)
+#             login(request, user)
+#             token_serializer = CustomTokenObtainPairSerializer()
+#             token = token_serializer.get_token(user)
+#             response_data = {
+#                 "user": serializer.data,
+#                 "token": {
+#                     "refresh": str(token),
+#                     "access": str(token),
+#                 },
+#                 "user_data": user_data,
+#             }
+#             print("user created")
+#             return Response(
+#                 data={
+#                     "data": response_data,
+#                 },
+#                 status=status.HTTP_200_OK,
+#             )
+#         else:
+#             return Response(
+#                 {"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST
+#             )
+
 class RegisterAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
@@ -49,40 +92,82 @@ class RegisterAPIView(APIView):
         data = request.data
         print("outer : ", request.user)
         print(data)
+        
         serializer = UserRegisterSerializer(
             data=data, context={"user_type": data.get("user_type")}
         )
-        if serializer.is_valid(raise_exception=True):
+        if serializer.is_valid(raise_exception=False):
             user = serializer.save()
-            user_data = {
-                "is_staff": user.is_staff_user,
-                "is_admin": user.is_admin_user,
-                "is_active": user.is_active,
-                "is_seller": user.is_seller_user,
-                "is_customer": user.is_customer_user,
-            }
-            print(user)
-            login(request, user)
-            token_serializer = CustomTokenObtainPairSerializer()
-            token = token_serializer.get_token(user)
-            response_data = {
-                "user": serializer.data,
-                "token": {
-                    "refresh": str(token),
-                    "access": str(token),
-                },
-                "user_data": user_data,
-            }
-            print("user created")
-            return Response(
-                data={
-                    "data": response_data,
-                },
-                status=status.HTTP_200_OK,
-            )
+            print("user")
+            email = user.email
+            
+            otp = send_otp_email(email)  # Function to send OTP to the user's email
+            
+            # You should implement send_otp_email function
+            
+            if otp:
+                response_data = {
+                    "message": "An OTP has been sent to your email.",
+                    "email": email
+                }
+                return Response(
+                    data={
+                        "data": response_data,
+                    },
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                user.delete()  # Delete the user if OTP sending fails
+                return Response(
+                    {"error": "Failed to send OTP. Please try again later."},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
         else:
             return Response(
                 {"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST
+            )
+        
+    def put(self, request, format=None):
+        email = request.data.get('email')
+        otp = request.data.get('otp')
+        
+        if email and otp:
+            if verify_otp(email, otp):  # Function to verify OTP
+                user = User.objects.get(email=email)
+                serializer = UserSerializer(user).data
+                login(request, user)
+                token_serializer = CustomTokenObtainPairSerializer()
+                token = token_serializer.get_token(user)
+                user_data = {
+                    "is_staff": user.is_staff_user,
+                    "is_admin": user.is_admin_user,
+                    "is_active": user.is_active,
+                    "is_seller": user.is_seller_user,
+                    "is_customer": user.is_customer_user,
+                }
+                response_data = {
+                    "user": serializer.data,
+                    "token": {
+                        "refresh": str(token),
+                        "access": str(token),
+                    },
+                    "user_data": user_data,
+                }
+                return Response(
+                    data={
+                        "data": response_data,
+                    },
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(
+                    {"error": "Invalid OTP."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            return Response(
+                {"error": "Email and OTP are required."},
+                status=status.HTTP_400_BAD_REQUEST
             )
 
 class LoginAPIView(APIView):
