@@ -36,7 +36,7 @@ class ProductSerializer(serializers.ModelSerializer):
     quantity = serializers.IntegerField(required=True, error_messages={
         'blank': 'Quantity should not be blank.', 'invalid': 'Set the quantity',
     })
-    brand = serializers.CharField(max_length=100, required=False, error_messages={
+    brand = serializers.PrimaryKeyRelatedField(queryset=Brand.objects.all(), required=True, error_messages={
         'blank': 'Brand should not be blank.'
     })
     thumbnail_image = serializers.ImageField(required=True, error_messages={

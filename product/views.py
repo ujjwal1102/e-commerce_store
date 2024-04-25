@@ -163,9 +163,9 @@ class ProductsAPIView(APIView):
               json.loads(request.data['features']))
         serializer = ProductSerializer(data=request.data)
         try:
-            print(serializer)
+            # print(serializer)
             if serializer.is_valid():
-                print(serializer)
+                # print(serializer)
                 product = "Saved"
                 product = serializer.save()
                 print(True, 'Valid', serializer)
@@ -176,7 +176,7 @@ class ProductsAPIView(APIView):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             print('Exception : ', e)
-            return Response(data='OK', status=status.HTTP_200_OK)
+            return Response(data=str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
 class ProductRetrieveAPIView(RetrieveAPIView):
