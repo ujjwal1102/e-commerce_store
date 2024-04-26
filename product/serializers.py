@@ -25,9 +25,7 @@ class ProductSerializer(serializers.ModelSerializer):
     description = serializers.CharField(max_length=20000, required=False, error_messages={
         'blank': 'Title should not be blank.'
     })
-    brand = serializers.CharField(max_length=100, required=True, error_messages={
-        'blank': 'Title should not be blank.'
-    })
+    
     cost = serializers.FloatField(default=None, required=False, error_messages={
         'blank': 'Title should not be blank.'
     })

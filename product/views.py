@@ -169,7 +169,7 @@ class ProductsAPIView(APIView):
                 product = "Saved"
                 product = serializer.save()
                 print(True, 'Valid', serializer)
-                return Response(ProductSerializer(product, many=True).data, status=status.HTTP_201_CREATED)
+                return Response(data="Product added Successfully", status=status.HTTP_201_CREATED)
             else:
                 print("serializer.error_messages : ", serializer.error_messages,
                       "\nserializer.errors : ", serializer.errors)
