@@ -12,8 +12,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
-# from dotenv import load_dotenv
-# load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,7 +28,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 SECRET_KEY = str(os.getenv("SECRET_KEY"))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*","ujjwal1102.pythonanywhere.com"]
 
@@ -156,7 +156,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [STATIC_DIR,]
 MEDIA_URL = '/media/'
-MEDIA_ROOT = '/home/ujjwal1102/ecommerce/media/'
+# MEDIA_ROOT = '/home/ujjwal1102/ecommerce/media/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
@@ -183,5 +183,6 @@ PAYMENT_CANCEL_URL = str(os.getenv("PAYMENT_CANCEL_URL"))
 # django-stripe settings
 STRIPE_PUBLIC_KEY = str(os.getenv("STRIPE_PUBLIC_KEY"))
 STRIPE_SECRET_KEY = str(os.getenv("STRIPE_SECRET_KEY"))
+print(STRIPE_PUBLIC_KEY)
 DJSTRIPE_WEBHOOK_SECRET = 'your_stripe_webhook_secret'
 DJSTRIPE_USE_NATIVE_JSONFIELD = True
