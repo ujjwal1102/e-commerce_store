@@ -28,7 +28,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 SECRET_KEY = str(os.getenv("SECRET_KEY"))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*","ujjwal1102.pythonanywhere.com"]
 
@@ -156,7 +156,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [STATIC_DIR,]
 MEDIA_URL = '/media/'
-# MEDIA_ROOT = '/home/ujjwal1102/ecommerce/media/'
+MEDIA_ROOT = '/home/ujjwal1102/ecommerce/media/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
