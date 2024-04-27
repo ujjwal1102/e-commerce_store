@@ -135,7 +135,7 @@ def dynamic_attributes_filtering_products(self, products, keysdict):
 
 
 class ProductsAPIView(APIView):
-    
+
     def get(self, request, format=None):
         try:
             products = Product.objects.all()[:8:1]
@@ -150,15 +150,15 @@ class ProductsAPIView(APIView):
             wishlist_serializer = WishlistSerializer(
                 wishlist_items, many=True).data
             wl_item = [ws['product']['id'] for ws in wishlist_serializer]
-            
+
             return Response(data={"data": serialized_products, "wl_item": wl_item}, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
             return Response(data={"exception": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, format=None):
-        
-            
+
+
         print("request.data", request.data, "request.data.json.loads",
               json.loads(request.data['features']))
         serializer = ProductSerializer(data=request.data)
@@ -169,14 +169,14 @@ class ProductsAPIView(APIView):
                 product = "Saved"
                 product = serializer.save()
                 print(True, 'Valid', serializer)
-                return Response(ProductSerializer(product, many=True).data, status=status.HTTP_201_CREATED)
+                return Response(data="Product added Successfully", status=status.HTTP_201_CREATED)
             else:
                 print("serializer.error_messages : ", serializer.error_messages,
                       "\nserializer.errors : ", serializer.errors)
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             print('Exception : ', e)
-            return Response(data='OK', status=status.HTTP_200_OK)
+            return Response(data=str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
 class ProductRetrieveAPIView(RetrieveAPIView):
@@ -374,7 +374,7 @@ class ProductFilter:
 
 class ShopCategoryAPIView(APIView):
     pf = ProductFilter()
-    
+
     def post(self, request, *args, **kwargs):
         try:
             id = self.kwargs['id']
@@ -413,7 +413,7 @@ class HomeShopAPIView(APIView):
             paginator = PageNumberPagination()
             categories_count = Product.objects.exclude(Q(category=None)).values(
                 "category__parent_id__id", "category__parent_id__category_name", "category__category_name", "category__id").annotate(product_count=Count('id')).order_by("-product_count").filter(product_count__gte=20)
-           
+
             prod = Product.objects.exclude(Q(thumbnail_image=None) | Q(category=None) | Q(thumbnail_image="")).annotate(
                 product_count=Count('id')
             ).order_by("-id").values(
@@ -468,7 +468,7 @@ class ShopView(APIView):
             fil_methods = self.pf.methods(request=request)
             mydata = self.pf.filtering_products(
                 self.pf.myqueryset, self.request.data)
-            
+
             print(self.request.data)
             results = paginator.paginate_queryset(
                 queryset=mydata["products"], request=request)
