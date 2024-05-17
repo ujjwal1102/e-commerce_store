@@ -43,7 +43,18 @@ class Product(models.Model):
         
         return
     
+class ProductReview(models.Model):
+    id = models.AutoField(auto_created=True,primary_key=True,null=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    rating = models.IntegerField()
+    review = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField('created_at', default=timezone.now)
 
+    class Meta:
+        unique_together = ('user', 'product')
+        
+        
 class Variant(models.Model):
     id = models.AutoField(auto_created=True,primary_key=True,null=False)
     product_id = models.ForeignKey(Product,on_delete=models.CASCADE)
