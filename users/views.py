@@ -20,7 +20,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token = AccessToken.for_user(user)
         token["first_name"] = user.first_name
         token["last_name"] = user.last_name
-        # token['username'] = user.username
+        token["id"] = user.id
+        token['email'] = user.email
         token["is_superuser"] = user.is_admin_user
         token["is_staff"] = user.is_staff_user
         token["is_active"] = user.is_active

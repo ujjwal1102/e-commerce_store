@@ -70,14 +70,14 @@
 #         return render(self.request,'seller/catalog/add_product.html')
 from typing import Any
 from rest_framework.views import APIView
-from .serializers import ProductSerializer, BrandSerializer
+from .serializers import ProductSerializer, BrandSerializer,ProductReviewSerializer
 from rest_framework.response import Response
-from product.models import Product, Brand
+from product.models import Product, Brand,ProductReview
 from category.models import Category
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny,IsAuthenticatedOrReadOnly
 # from django.shortcuts import get_object_or_404
-from rest_framework.generics import ListAPIView, UpdateAPIView, RetrieveAPIView
+from rest_framework.generics import ListAPIView, UpdateAPIView, RetrieveAPIView,ListCreateAPIView,RetrieveUpdateDestroyAPIView
 from wishlist.models import ProductWishlist
 from wishlist.serializers import WishlistSerializer
 from rest_framework.decorators import api_view
@@ -501,3 +501,19 @@ class SellerHomePageView(APIView):
         products = Product.objects.filter()
         return Response(data={"products": {"total": 0, "active": 0, "sold": 0}}, status=status.HTTP_200_OK)
 
+class ProductReviewListCreateView(ListCreateAPIView):
+    queryset = ProductReview.objects.all()
+    serializer_class = ProductReviewSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+    
+    def filter_queryset(self, queryset):
+        print("queryset",queryset)
+        return super().filter_queryset(queryset)
+    
+# class ProductReviewDetailView(RetrieveUpdateDestroyAPIView):
+#     queryset = ProductReview.objects.all()
+#     serializer_class = ProductReviewSerializer
+#     permission_classes = [IsAuthenticatedOrReadOnly]

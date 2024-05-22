@@ -1,10 +1,10 @@
-from .models import Product, Brand
+from .models import Product, Brand, ProductReview
 
 from rest_framework import serializers
 from category.models import Category
 from django.core.validators import MinLengthValidator
 from users.models import User
-
+from datetime import datetime
 
 class ProductSerializer(serializers.ModelSerializer):
     name = serializers.CharField(
@@ -109,8 +109,26 @@ class ProductSerializer(serializers.ModelSerializer):
         # This method is called when creating a new instance
         return Product.objects.create(**validated)
 
-
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Brand
         fields = '__all__'
+
+class ProductReviewSerializer(serializers.ModelSerializer):
+    user_name = serializers.SerializerMethodField()
+    posted_on = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = ProductReview
+        fields = ['id', 'user','user_name', 'product', 'rating', 'review', 'created_at','posted_on']
+        read_only_fields = ['id', 'created_at']
+
+    def get_user_name(self, obj):
+        if (obj.user.first_name != ""):
+            return str(obj.user.first_name) + str(obj.user.last_name)
+        else :
+            return obj.user.id
+        
+    def get_posted_on(self, obj):
+        date = obj.created_at
+        return date.strftime('%d %B %Y')
