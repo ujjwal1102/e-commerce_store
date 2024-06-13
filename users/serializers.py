@@ -1,4 +1,4 @@
-from users.models import User, Customer
+from users.models import User, Customer,OTP
 from rest_framework import serializers
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model, authenticate
@@ -87,10 +87,17 @@ class UserRegisterSerializer(serializers.ModelSerializer):
                 user = super().create(validated_data)
 
         user.set_password(validated_data['password'])
+        user.is_active = False
         user.save()
 
         return user
 
+
+class OTPSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OTP
+        fields = ['email', 'otp', 'created_at']
+        
 
 class CustomerSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())

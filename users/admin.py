@@ -1,4 +1,4 @@
-from .models import Customer, User
+from .models import Customer, User,OTP
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.contrib import admin
@@ -47,3 +47,4 @@ class CustomUserAdmin(BaseUserAdmin):
 
 
 admin.site.register(User, CustomUserAdmin)
+admin.site.register(OTP)

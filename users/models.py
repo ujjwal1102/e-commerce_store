@@ -39,7 +39,7 @@ class UserManager(BaseUserManager):
     
     def create_seller(self, email, password=None, **extra_fields):
         user = self.create_user(email, password=password, **extra_fields)
-        user.is_active = True
+        user.is_active = False
         user.is_seller = True
         user.save(using=self._db)
         return user
@@ -122,4 +122,10 @@ class Customer(models.Model):
     pin_code = models.CharField(max_length=6,null=True,blank=True)
     
     
+    
+class OTP(models.Model):
+    id = models.AutoField(auto_created=True,primary_key=True,null=False)
+    email = models.EmailField(unique=True, null=True)
+    otp = models.IntegerField(null=False)
+    created_at = models.DateTimeField(auto_now_add=True)
     
