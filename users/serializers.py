@@ -76,18 +76,24 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
+        print("UserRegisterSerializer : ",validated_data,self.context.items())
         validated_data.pop('confirm_password', None)
         user_type = self.context.get('user_type', None)
+        print("user_type : ",user_type)
         with transaction.atomic():
             if user_type == 'customer':
+                
                 user = User.objects.create_customer(**validated_data)
+                print("Created customer")
             elif user_type == 'seller':
                 user = User.objects.create_seller(**validated_data)
+                print("Created seller")
             else:
                 user = super().create(validated_data)
+                print("Created user")
 
         user.set_password(validated_data['password'])
-        user.is_active = False
+        user.is_active = True
         user.save()
 
         return user

@@ -17,16 +17,12 @@ def send_otp_email(email):
 
 
 def verify_otp(email, otp):
-    # user = User.objects.get(email=email)
-    # serializer = UserSerializer(user).data
-    otp_obj = get_object_or_404(OTP,email=email)
+    otp_obj = get_object_or_404(OTP, email=email)
     dt = timezone.now()
-    print(otp_obj.otp, otp, otp_obj.created_at, dt)
     otp_valid_duration = datetime.timedelta(minutes=1)
     if int(otp_obj.otp) == int(otp) and ((dt - otp_obj.created_at) <= otp_valid_duration):
-        otp_obj.delete()
+        otp_obj.delete()  # Delete OTP only when it is correct
         return True
     else:
-        otp_obj.delete()
         return False
 
