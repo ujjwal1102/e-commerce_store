@@ -59,7 +59,7 @@ class Product(models.Model):
     @classmethod
     def filter_by_name(cls,name):
         return cls.objects.filter(name__icontains=name)
-    
+
     # @classmethod
     # def filter_by_title(cls,title):
     #     return cls.objects.filter(title__icontains=title)
