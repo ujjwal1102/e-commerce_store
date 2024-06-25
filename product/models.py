@@ -52,7 +52,6 @@ class Product(models.Model):
 
         # Get unique brands with their count
         brands = products.values('brand__brand_name').annotate(count=Count('brand')).order_by('brand__brand_name')
-
         # print(categories, brands)
         return products
         
