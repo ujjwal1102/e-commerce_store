@@ -372,10 +372,7 @@ class ShopView(APIView):
                 queryset=fil_prod, request=request)
             wl_items = self.pf.get_user_wishlist(request)
             print("len(results):", len(results))
-            # print(paginator.get_next_link(),
-            #       paginator.get_previous_link(),
-            #       paginator.get_schema_operation_parameters,
-            #       )
+            
 
             serialized_data = ProductSerializer(results, many=True).data
 
