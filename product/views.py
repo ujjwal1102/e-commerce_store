@@ -6,9 +6,11 @@ from product.models import Product, Brand,ProductReview
 from category.models import Category
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny,IsAuthenticatedOrReadOnly
-# from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListAPIView, UpdateAPIView, RetrieveAPIView,ListCreateAPIView,RetrieveUpdateDestroyAPIView
 from wishlist.models import ProductWishlist
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 from wishlist.serializers import WishlistSerializer
 from rest_framework.decorators import api_view
 
@@ -442,7 +444,11 @@ class ProductReviewListCreateView(ListCreateAPIView):
         serializer.save(user=self.request.user)
     
     def filter_queryset(self, queryset):
-        print("queryset",queryset)
+        print(self.kwargs['pk'])
+        product_id = self.kwargs['pk']
+        if product_id:
+            product = get_object_or_404(Product, id=product_id)
+            queryset = queryset.filter(product=product)
         return super().filter_queryset(queryset)
     
 # class ProductReviewDetailView(RetrieveUpdateDestroyAPIView):
