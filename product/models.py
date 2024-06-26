@@ -43,15 +43,18 @@ class Product(models.Model):
         """
         query = Q()
         for key, value in filter_data.items():
-            query &= Q(**{key: value})
+            value = value.split(" ")
+            for v in value:
+                query &= Q(**{key: v})
+                print(query)
         
-        products = cls.objects.filter(query)
-        
+        products = cls.objects.complex_filter(query)[:5]
+        print(products)
         # Get unique categories with their count
-        categories = products.values('category__category_name').annotate(count=Count('category')).order_by('category__category_name')
+        # categories = products.values('category__category_name').annotate(count=Count('category')).order_by('category__category_name')
 
         # Get unique brands with their count
-        brands = products.values('brand__brand_name').annotate(count=Count('brand')).order_by('brand__brand_name')
+        # brands = products.values('brand__brand_name').annotate(count=Count('brand')).order_by('brand__brand_name')
         # print(categories, brands)
         return products
         
