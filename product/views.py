@@ -1,73 +1,3 @@
-# from typing import Any, Dict
-# from django.http import HttpRequest, HttpResponse
-# from django.shortcuts import render,redirect
-# from .models import Product,ProductImages
-# # Create your views here.
-# import json
-# from .forms import AddNewProductForm,AddProductsImagesForm,VariantForm
-# from django.views.generic.edit import CreateView,FormView
-# from django.views.generic import ListView,DetailView
-# from django.views import View
-
-
-# class AddProductView(FormView):
-#     form_class = [AddNewProductForm,AddProductsImagesForm]
-#     template_name = 'products/add_products_form.html'
-
-#     def get(self, request):
-#         form1 = AddNewProductForm()
-#         form2 = AddProductsImagesForm()
-#         print(form1.fields['category'].choices)
-#         return render(self.request, 'products/add_product_form.html', {'form1': form1, 'form2': form2})
-
-#     def post(self, request: HttpRequest, *args: str, **kwargs: Any) :
-#         # context = super().post(request, *args, **kwargs)
-#         form1 = AddNewProductForm(self.request.POST,self.request.FILES)
-#         form2 = AddProductsImagesForm(self.request.POST,self.request.FILES)
-#         if form1.is_valid() and form2.is_valid():
-#             print('CORRECT')
-
-#             featurename = self.request.POST.getlist('featurename')
-#             featurevalue = self.request.POST.getlist('featurevalue')
-#             print(featurename,len(featurename),featurevalue,len(featurevalue))
-#             details_dict = {}
-#             for i in range(len(featurename)):
-#                 details_dict[featurename[i]] = featurevalue[i]
-#             print(details_dict)
-#             details_json = json.dumps(details_dict)
-#             prod_id = form1.save_data(details_json=details_json)
-#             form2.save_form(prod_id=prod_id)
-
-#             print("Form Saved Successfully")
-
-#             return redirect('index')
-#         else:
-#             print('form1.errors : ',form1.errors)
-#             print('form2.errors : ',form2.errors)
-#             return render(request, 'products/add_product_form.html', {'form1':form1,'form2':form2})
-
-# class ProductListView(ListView):
-#     model = Product
-#     template_name = 'products/product_list.html'
-
-# class ProductDetailView(DetailView):
-#     model = Product
-#     template_name = 'products/product_detail.html'
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['product_images'] = ProductImages.objects.filter(product_image_id =  self.kwargs['pk'])
-#         context['details'] = json.loads(context['object'].details)
-#         print(type(context['details']))
-#         return context
-
-# class Seller(View):
-#     def get(self,*args,**kwargs):
-#         return render(self.request,'seller/homepage.html')
-
-# class AddMyProd(View):
-#     def get(self,*args,**kwargs):
-#         return render(self.request,'seller/catalog/add_product.html')
 from typing import Any
 from rest_framework.views import APIView
 from .serializers import ProductSerializer, BrandSerializer,ProductReviewSerializer
@@ -81,6 +11,7 @@ from rest_framework.generics import ListAPIView, UpdateAPIView, RetrieveAPIView,
 from wishlist.models import ProductWishlist
 from wishlist.serializers import WishlistSerializer
 from rest_framework.decorators import api_view
+
 import json
 
 from rest_framework.pagination import PageNumberPagination
@@ -163,20 +94,20 @@ class ProductsAPIView(APIView):
               json.loads(request.data['features']))
         serializer = ProductSerializer(data=request.data)
         try:
-            print(serializer)
+            # print(serializer)
             if serializer.is_valid():
-                print(serializer)
+                # print(serializer)
                 product = "Saved"
                 product = serializer.save()
                 print(True, 'Valid', serializer)
-                return Response(ProductSerializer(product, many=True).data, status=status.HTTP_201_CREATED)
+                return Response(data="Product added Successfully", status=status.HTTP_201_CREATED)
             else:
                 print("serializer.error_messages : ", serializer.error_messages,
                       "\nserializer.errors : ", serializer.errors)
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             print('Exception : ', e)
-            return Response(data='OK', status=status.HTTP_200_OK)
+            return Response(data=str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
 class ProductRetrieveAPIView(RetrieveAPIView):
@@ -501,6 +432,7 @@ class SellerHomePageView(APIView):
         products = Product.objects.filter()
         return Response(data={"products": {"total": 0, "active": 0, "sold": 0}}, status=status.HTTP_200_OK)
 
+
 class ProductReviewListCreateView(ListCreateAPIView):
     queryset = ProductReview.objects.all()
     serializer_class = ProductReviewSerializer
@@ -517,3 +449,16 @@ class ProductReviewListCreateView(ListCreateAPIView):
 #     queryset = ProductReview.objects.all()
 #     serializer_class = ProductReviewSerializer
 #     permission_classes = [IsAuthenticatedOrReadOnly]
+
+
+class ProductFiltering(APIView):
+    
+    def post(self,request,*args,**kwargs):
+        
+        data  = self.request.data
+        print('data',data)
+        results = Product.filter_products(filter_data=data)
+        serialized_results = ProductSerializer(results, many=True).data
+        return Response(data={"results":serialized_results},status=status.HTTP_202_ACCEPTED)
+        
+

@@ -135,6 +135,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
@@ -182,3 +187,11 @@ STRIPE_PUBLIC_KEY = str(os.getenv("STRIPE_PUBLIC_KEY"))
 STRIPE_SECRET_KEY = str(os.getenv("STRIPE_SECRET_KEY"))
 DJSTRIPE_WEBHOOK_SECRET = 'your_stripe_webhook_secret'
 DJSTRIPE_USE_NATIVE_JSONFIELD = True
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "ujjwal.srivastava@laitkor.com"
+EMAIL_HOST_PASSWORD = "zmkpjgahnmopoghk"

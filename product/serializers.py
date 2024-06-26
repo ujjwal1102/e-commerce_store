@@ -25,9 +25,7 @@ class ProductSerializer(serializers.ModelSerializer):
     description = serializers.CharField(max_length=20000, required=False, error_messages={
         'blank': 'Title should not be blank.'
     })
-    brand = serializers.CharField(max_length=100, required=True, error_messages={
-        'blank': 'Title should not be blank.'
-    })
+    
     cost = serializers.FloatField(default=None, required=False, error_messages={
         'blank': 'Title should not be blank.'
     })
@@ -36,7 +34,7 @@ class ProductSerializer(serializers.ModelSerializer):
     quantity = serializers.IntegerField(required=True, error_messages={
         'blank': 'Quantity should not be blank.', 'invalid': 'Set the quantity',
     })
-    brand = serializers.CharField(max_length=100, required=False, error_messages={
+    brand = serializers.PrimaryKeyRelatedField(queryset=Brand.objects.all(), required=True, error_messages={
         'blank': 'Brand should not be blank.'
     })
     thumbnail_image = serializers.ImageField(required=True, error_messages={

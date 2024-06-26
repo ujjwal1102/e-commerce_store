@@ -1,44 +1,28 @@
-# from django import forms  
-# from django.contrib.auth.models import User  
-# from django.contrib.auth.forms import UserCreationForm  
-# from django.core.exceptions import ValidationError  
-# from django.forms.fields import EmailField  
-# from django.forms.forms import Form  
-  
-# class SignUpValidation(): 
-#     pass 
-#     # username = forms.CharField(label='username', min_length=5, max_length=150)  
-#     # email = forms.EmailField(label='email')  
-#     # password1 = forms.CharField(label='password', widget=forms.PasswordInput)  
-#     # password2 = forms.CharField(label='Confirm password', widget=forms.PasswordInput)  
-  
-  
-#     # def username_clean(self):  
-#     #     username = self.cleaned_data['username'].lower()  
-#     #     new = User.objects.filter(username = username)  
-#     #     if new.count():  
-#     #         raise ValidationError("User Already Exist")  
-#     #     return username  
-  
-#     # def email_clean(self):  
-#     #     email = self.cleaned_data['email'].lower()  
-#     #     new = User.objects.filter(email=email)  
-#     #     if new.count():  
-#     #         raise ValidationError(" Email Already Exist")  
-#     #     return email  
-  
-#     # def clean_password2(self):  
-#     #     password1 = self.cleaned_data['password1']  
-#     #     password2 = self.cleaned_data['password2']  
-  
-#     #     if password1 and password2 and password1 != password2:  
-#     #         raise ValidationError("Password don't match")  
-#     #     return password2  
-  
-#     # def save(self, commit = True):  
-#     #     user = User.objects.create_user(  
-#     #         self.cleaned_data['username'],  
-#     #         self.cleaned_data['email'],  
-#     #         self.cleaned_data['password1']  
-#     #     )  
-#     #     return user  
+import random, datetime
+from django.core.mail import send_mail
+from django.conf import settings
+from .models import OTP
+from users.models import User
+from .serializers import UserSerializer
+from django.utils import timezone
+from django.shortcuts import get_object_or_404
+def send_otp_email(email):
+    otp = random.randint(100000, 999999)
+    subject = "Verification OTP"
+    message = f"Your OTP is {otp}."
+    from_email = settings.EMAIL_HOST_USER
+    recipient_list = [email]
+    send_mail(subject, message, from_email, recipient_list)
+    return otp
+
+
+def verify_otp(email, otp):
+    otp_obj = get_object_or_404(OTP, email=email)
+    dt = timezone.now()
+    otp_valid_duration = datetime.timedelta(minutes=1)
+    if int(otp_obj.otp) == int(otp) and ((dt - otp_obj.created_at) <= otp_valid_duration):
+        otp_obj.delete()  # Delete OTP only when it is correct
+        return True
+    else:
+        return False
+

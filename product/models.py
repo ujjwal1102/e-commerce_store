@@ -3,6 +3,7 @@ from category.models import Category
 from django.utils import timezone
 from django.urls import reverse
 from users.models import User
+from django.db.models import Q,Count
 
 class Brand(models.Model):
     id = models.AutoField(auto_created=True,primary_key=True,null=False)
@@ -32,17 +33,38 @@ class Product(models.Model):
     def get_absolute_url(self):
         return reverse('prod_detail', args=[str(self.id)])
     
-    def filter_products_data(self,filter_data={}):
-        new_data = None
-        if filter_data:
-            filter_keys = filter_data.keys()
-            
-            for k in filter_keys:
-                new_data = self.objects.filter(k = k)
-            
+    @classmethod
+    def filter_products(cls,filter_data):
+        """
+        Filter products based on filter_data dictionary.
+        filter_data: Dictionary containing filtering criteria.
         
-        return
+        Example: {'category__name__icontains': 'electronics', 'brand__name__icontains': 'sony'}
+        """
+        query = Q()
+        for key, value in filter_data.items():
+            query &= Q(**{key: value})
+        
+        products = cls.objects.filter(query)
+        
+        # Get unique categories with their count
+        categories = products.values('category__category_name').annotate(count=Count('category')).order_by('category__category_name')
+
+        # Get unique brands with their count
+        brands = products.values('brand__brand_name').annotate(count=Count('brand')).order_by('brand__brand_name')
+        # print(categories, brands)
+        return products
+        
+         
+    @classmethod
+    def filter_by_name(cls,name):
+        return cls.objects.filter(name__icontains=name)
+
+    # @classmethod
+    # def filter_by_title(cls,title):
+    #     return cls.objects.filter(title__icontains=title)
     
+
 class ProductReview(models.Model):
     id = models.AutoField(auto_created=True,primary_key=True,null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -50,6 +72,23 @@ class ProductReview(models.Model):
     rating = models.IntegerField()
     review = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField('created_at', default=timezone.now)
+
+    # @classmethod
+    # def filter_by_brand(cls,brand):
+    #     return cls.objects.filter(brand__icontains=brand)
+    
+    # @classmethod
+    # def filter_by_name(cls,name):
+    #     return cls.objects.filter(name__icontains=name)
+    
+    # @classmethod
+    # def filter_by_name(cls,name):
+    #     return cls.objects.filter(name__icontains=name)
+    
+    # @classmethod
+    # def filter_by_name(cls,name):
+    #     return cls.objects.filter(name__icontains=name)
+        
 
     class Meta:
         unique_together = ('user', 'product')
